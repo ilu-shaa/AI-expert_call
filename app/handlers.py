@@ -53,3 +53,4 @@ async def voice_Acting_end(message: Message, state: FSMContext, bot: Bot):
     WorkWithTTS.text_to_speech(text = message.text, language = 'ru')
     audio = FSInputFile('TTS.mp3')
     await bot.send_audio(message.chat.id, audio)
+    os.remove('TTS.mp3')
