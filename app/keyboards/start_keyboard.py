@@ -7,3 +7,4 @@ start = InlineKeyboardMarkup(inline_keyboard=[
      [InlineKeyboardButton(text="Озвучить презентацию", callback_data = 'voiceActing')]
 ])
 back_to_start = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data = 'backStart')]])
+back_to_start_delete = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data = 'backStartDelete')]])

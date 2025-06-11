@@ -1,16 +1,18 @@
 from aiogram import F, Router, Bot
 from aiogram.filters import Command, BaseFilter
-from aiogram.types import Message, CallbackQuery, BufferedInputFile
+from aiogram.types import Message, CallbackQuery, BufferedInputFile, InputMediaAudio, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 from io import BytesIO
 
 import keyboards.start_keyboard as start_kb
-from bot_answers import greetings
+
+from static_files.bot_answers import greetings
 
 from workTools.WorkWithTTS import WorkWithTTS
 
+#Можно использовать чтобы отслеживать голосовые сообщения
 class VoiceFilter(BaseFilter):
     async def __call__(self, message: Message) -> bool:
         return bool(message.voice)
@@ -25,13 +27,26 @@ user_message = F.data.split()
 async def command_start(message: Message):
     await message.answer(greetings, reply_markup = start_kb.start)
 
+@router.callback_query(F.data == 'backStartDelete')
+async def back_to_start(callback: CallbackQuery):
+    await callback.message.delete()
+    await callback.message.answer(greetings, reply_markup = start_kb.start)
+
 @router.callback_query(F.data == 'backStart')
 async def back_to_start(callback: CallbackQuery):
     await callback.message.edit_text(greetings, reply_markup = start_kb.start)
 
 @router.callback_query(F.data == 'performance')
-async def performance(callback: CallbackQuery):
-    await callback.message.edit_text('Представление', reply_markup = start_kb.back_to_start) # запрос в нейронке
+async def performance(callback: CallbackQuery, bot: Bot):
+    await bot.edit_message_media(
+            chat_id=callback.message.chat.id,
+            message_id=callback.message.message_id,
+            media=InputMediaAudio(
+                media = FSInputFile('C:/Users/Proger/Documents/AI-expert_call/app/static_files/TTS.mp3'), #TODO: аудио с представлением продукта
+                caption = 'Представление продукта' #TODO: текст с представлением продукта
+            ),
+            reply_markup = start_kb.back_to_start_delete
+        )
 
 @router.callback_query(F.data == 'question')
 async def question(callback: CallbackQuery):
@@ -41,6 +56,7 @@ async def question(callback: CallbackQuery):
 async def compare(callback: CallbackQuery):
     await callback.message.edit_text('Выберете продукт для сравнения', reply_markup = start_kb.back_to_start) # reply_markap = compare kb
 
+#TODO: удалить пример отправки аудио
 #Как пример отправки аудио
 @router.callback_query(F.data == 'voiceActing')
 async def voice_Acting_start(callback: CallbackQuery, state: FSMContext):
