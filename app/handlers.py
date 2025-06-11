@@ -1,10 +1,11 @@
 from aiogram import F, Router, Bot
 from aiogram.filters import Command, BaseFilter
-from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, BufferedInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 import os
+from io import BytesIO
 
 import keyboards.start_keyboard as start_kb
 from bot_answers import greetings
@@ -50,7 +51,9 @@ async def voice_Acting_start(callback: CallbackQuery, state: FSMContext):
 async def voice_Acting_end(message: Message, state: FSMContext, bot: Bot):
     await state.update_data(presentation_text = message.text)
     await state.clear()
-    WorkWithTTS.text_to_speech(text = message.text, language = 'ru')
-    audio = FSInputFile('TTS.mp3')
-    await bot.send_audio(message.chat.id, audio)
-    os.remove('TTS.mp3')
+    auido_bytes = BytesIO()
+    tts = WorkWithTTS.text_to_speech(text = message.text, language = 'ru')
+    tts.write_to_fp(auido_bytes)
+    auido_bytes.seek(0)
+    audio = BufferedInputFile(file = auido_bytes.read(), filename = "voice.mp3")
+    await message.answer_audio(audio = audio)
