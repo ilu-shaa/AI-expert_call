@@ -5,6 +5,8 @@ from aiogram.types import Message, CallbackQuery
 import keyboards.start_keyboard as start_kb
 from bot_answers import greetings
 
+from workTools.WorkWithTTS import WorkWithTTS
+
 class VoiceFilter(BaseFilter):
     async def __call__(self, message: Message) -> bool:
         return bool(message.voice)
