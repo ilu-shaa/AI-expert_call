@@ -4,7 +4,6 @@ from aiogram.types import Message, CallbackQuery, BufferedInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-import os
 from io import BytesIO
 
 import keyboards.start_keyboard as start_kb
@@ -42,6 +41,7 @@ async def question(callback: CallbackQuery):
 async def compare(callback: CallbackQuery):
     await callback.message.edit_text('Выберете продукт для сравнения', reply_markup = start_kb.back_to_start) # reply_markap = compare kb
 
+#Как пример отправки аудио
 @router.callback_query(F.data == 'voiceActing')
 async def voice_Acting_start(callback: CallbackQuery, state: FSMContext):
     await state.set_state(Flag.presentation_text)
