@@ -56,6 +56,16 @@ async def question(callback: CallbackQuery):
 async def compare(callback: CallbackQuery):
     await callback.message.edit_text('Выберете продукт для сравнения', reply_markup = start_kb.back_to_start) # reply_markap = compare kb
 
+@router.callback_query(F.data == 'certificate')
+async def compare(callback: CallbackQuery):
+    await callback.message.delete()
+    await callback.message.answer("Информация о сертификации", reply_markup = start_kb.back_to_start) #TODO: информация по сертификации
+
+@router.callback_query(F.data == 'features')
+async def compare(callback: CallbackQuery):
+    await callback.message.delete()
+    await callback.message.answer("Технические характеристики", reply_markup = start_kb.back_to_start) #TODO: тех хар-ки
+
 #TODO: удалить пример отправки аудио
 #Как пример отправки аудио
 @router.callback_query(F.data == 'voiceActing')
