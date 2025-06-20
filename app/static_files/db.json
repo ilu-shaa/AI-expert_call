@@ -1,0 +1,181 @@
+{"JOUAV CW-15" : {
+  "manufacturer": "JOUAV",
+  "country": "China",
+  "category": "Fixed-wing VTOL",
+  "role": "Industrial inspection, mapping, surveillance",
+  "release_year": 2020,
+  "dimensions": {
+    "length_mm": 2060,
+    "wingspan_mm": 3540,
+    "height_mm": 500
+  },
+  "weights": {
+    "empty_weight_kg": 6.5,
+    "max_takeoff_weight_kg": 15,
+    "max_payload_kg": 3
+  },
+  "performance": {
+    "max_speed_kmh": 61,
+    "cruise_speed_kmh": 61,
+    "flight_time_min": 180,
+    "max_range_km": 50,
+    "service_ceiling_m": 6500,
+    "rate_of_climb_mps": null
+  },
+  "power_system": {
+    "power_type": "Electric",
+    "battery_type": "Li-ion"
+  },
+  "motors": {
+    "motor_count": 4,
+    "propeller_diameter_in": 12
+  },
+  "comms": {
+    "control_link": "4G/LTE + RF",
+    "telemetry_link": "Real-time HD video",
+    "ads_b": "Yes"
+  },
+  "autonomy": {
+    "autopilot": "Yes (DJI compatible)",
+    "GNSS": "GPS/GLONASS/BeiDou",
+    "obstacle_avoidance": "ADS-B only"
+  },
+  "payloads_supported": {
+    "camera_types": "RGB, multispectral, thermal",
+    "LiDAR": "Yes (JoLiDAR-1000)", 
+    "other_sensors": "Gas detectors, radiation sensors",
+    "payload_modularity": "Hot-swappable"
+  },
+  "environment": {
+    "operating_temp_min_c": -20,
+    "operating_temp_max_c": 50,
+    "max_wind_resistance_mps": 12,
+    "rain_resistance": "Light rain protection" 
+  },
+  "launch_method": "Autonomous VTOL",
+  "landing_method": "Autonomous landing",
+  "certification_status": "ISO9001", 
+  "compliance_documents": [
+    "ISO9001:2015 Quality Certificate"
+  ],
+  "unit_price_usd": 25000,
+  "logistics_requirements": "Transport case (1600×800×600 mm), 2-person assembly",
+  "use_cases": [
+    "Precision agriculture", 
+    "Power line inspection"
+  ],
+  "case_studies": [
+    {
+      "name": "Shandong Wheat Crop Monitoring", 
+      "result": "Hyper-spectral imaging with X20P camera"
+    }
+  ],
+  "sources": [
+    {"url": "https://www.jouav.com/products/cw-15.html", "description": "Official specifications"},
+    {"url": "https://www.jouav.com/download/JOUAV_CW-15_Datasheet_EN.pdf", "description": "Official datasheet (2023)"},
+    {"url": "https://doi.org/10.1016/j.drone.2021.100003", "description": "Agricultural use case study"}
+  ]
+},
+"EH216-S" : {
+  "manufacturer": "EHang",
+  "country": "China",
+  "category": "Multicopter eVTOL",
+  "role": "Urban air mobility (passenger transport)",
+  "first_flight_year": 2016,
+  "certification_year": 2023,
+  "commercial_service_start": 2024,
+  "dimensions": {
+    "length_mm": 5600,
+    "wingspan_mm": 5600,
+    "height_mm": 1900
+  },
+  "weights": {
+    "empty_weight_kg": 360,
+    "max_takeoff_weight_kg": 650,
+    "max_payload_kg": 220
+  },
+  "performance": {
+    "max_speed_kmh": 130,
+    "cruise_speed_kmh": 100,
+    "flight_time_min": 25,
+    "max_range_km": 35,
+    "service_ceiling_m": 3000,
+    "rate_of_climb_mps": 6
+  },
+  "power_system": {
+    "power_type": "Electric",
+    "battery_type": "High-energy-density LiPo",
+    "battery_capacity_wh": "~152000 (Estimated, not officially confirmed)",
+    "fuel_capacity_l": null 
+  },
+  "motors": {
+    "motor_count": 16,
+    "motor_power_w": 5000,
+    "propeller_diameter_in": 24
+  },
+  "comms": {
+    "control_link": "5G + redundant RF",
+    "data_link_range_km": 30,
+    "telemetry_link": "Real-time cabin monitoring",
+    "ads_b": "Yes (ADS-B In/Out)"
+  },
+  "autonomy": {
+    "autopilot": "Full autonomous flight",
+    "GNSS": "GPS/BeiDou with RTK",
+    "obstacle_avoidance": "LiDAR + computer vision"
+  },
+  "payloads_supported": {
+    "camera_types": "360° safety cameras",
+    "LiDAR": "Integrated for navigation (Not user payload)",
+    "other_sensors": "Emergency parachute system",
+    "payload_modularity": "Fixed passenger cabin (2 seats)"
+  },
+  "environment": {
+    "operating_temp_min_c": -10,
+    "operating_temp_max_c": 40,
+    "max_wind_resistance_mps": 8,
+    "rain_resistance": "IP55"
+  },
+  "launch_method": "Vertical takeoff (VTOL)",
+  "landing_method": "Autonomous landing pad",
+  "certification_status": {
+    "CAAC": "Type Certified (October 2023)",
+    "EASA": "Validation in progress (SC-VTOL-01)"
+  },
+  "compliance_documents": [
+    "CAAC Type Certificate No. TC0069A-EL",
+    "EASA SC-VTOL-01 (Basis for validation)"
+  ],
+  "unit_price_usd": "~330,000 (Estimated)",
+  "logistics_requirements": "Requires vertipad infrastructure",
+  "use_cases": [
+    "Urban air taxi services",
+    "Emergency medical transport"
+  ],
+  "case_studies": [
+    {
+      "name": "Guangzhou AAM Pilot Program",
+      "result": "Conducted 2000+ autonomous demonstration flights"
+    }
+  ],
+  "notes": [ 
+    "Flight time/range estimates are for optimal conditions",
+    "Battery capacity value is based on third-party estimates",
+    "EASA validation expected by 2025"
+  ],
+  "sources": [
+    {
+       "url": "https://www.ehang.com/ehang216/",
+       "description": "Manufacturer specifications"
+    },
+    {
+      "url": "https://www.ehang.com/news/695.html",
+      "description": "CAAC Certification Announcement (Oct 2023)"
+    },
+    {
+      "url": "https://www.easa.europa.eu/en/document-library/special-conditions/sc-vtol-01-ehang-intelligent-energy-ehang-216-s",
+      "description": "EASA SC-VTOL-01"
+    }
+  ]
+}
+}
