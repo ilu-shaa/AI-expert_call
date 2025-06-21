@@ -11,5 +11,11 @@ VOSK_MODELS = {
     'cn': os.path.join(BASE_DIR, 'static_files', 'vosk-model-cn-0.22'),
 }
 
-MISTRAL_API_KEY = "JqBJDmM0zUFSXeq63JujtwhAlExw6nmV"
-MISTRAL_API_URL = "https://api.mistral.ai/v1/models/mistral-7b-instruct/completions"
+
+MISTRAL_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+# API‑ключ для OpenRouter (Mistral)
+OPENROUTER_API_KEY  = "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"
+
+# Путь к локальной Llama 2‑13B
+USE_LOCAL_QWEN = True
+ 
