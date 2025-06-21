@@ -1,0 +1,17 @@
+cd ..../AI-expert_call
+
+python -m venv .venv
+.\.venv\Scripts\activate
+
+pip install -r requirements.txt
+
+python -m app.main
+
+
+###
+Добавь путь C:\ffmpeg\bin в переменную среды PATH:
+
+Пуск → "Система" → "Дополнительные параметры" → "Переменные среды"
+
+Найди Path → Изменить → Добавить C:\ffmpeg\bin → OK
+###
