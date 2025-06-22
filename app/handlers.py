@@ -42,7 +42,7 @@ async def show_intro(c: CallbackQuery, bot: Bot):
 
     text = await MistralAPI.query(prompt = f"Переведи с русского на {chat_lang.get(c.message.chat.id, 'ru')} {PRESENTAION_VTOL_DRONES}", token = OPENROUTER_API_KEY)
 
-    audio_bytes = WorkWithTTS.text_to_speech(text, chat_lang.get(c.message.chat.id, 'ru'))
+    audio_bytes = await WorkWithTTS.text_to_speech(text, chat_lang.get(c.message.chat.id, 'ru'))
     audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
 
     await bot.edit_message_media(
