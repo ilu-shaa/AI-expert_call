@@ -14,6 +14,7 @@ from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES
 from workTools.WorkWithDB import WorkWithDB
 from workTools.WorkWithTTS import WorkWithTTS
 from workTools.WorkWithLLM import MistralAPI
+from workTools.WorkWithCache import WorkWithCache
 
 # FSM состояния
 class Flag(StatesGroup):
@@ -40,9 +41,14 @@ async def set_lang(c: CallbackQuery):
 async def show_intro(c: CallbackQuery, bot: Bot):
     from new_voice_handler import chat_lang
 
-    text = await MistralAPI.query(prompt = f"Переведи с русского на {chat_lang.get(c.message.chat.id, 'ru')} {PRESENTAION_VTOL_DRONES}", token = OPENROUTER_API_KEY)
+    cache_key = 'presentaion' + chat_lang.get(c.message.chat.id, 'ru')
+    check_key = WorkWithCache.check_key(cache_key)
+    if check_key:
+        audio_bytes, text = WorkWithCache.get_cache(cache_key)
+    else:
+        text = await MistralAPI.query(prompt = f"Переведи с русского на {chat_lang.get(c.message.chat.id, 'ru')} {PRESENTAION_VTOL_DRONES}", token = OPENROUTER_API_KEY)
+        audio_bytes = await WorkWithTTS.text_to_speech(task = 'presentaion', text = text, lang = chat_lang.get(c.message.chat.id, 'ru'))
 
-    audio_bytes = await WorkWithTTS.text_to_speech(task = 'presentaion', text = text, lang = chat_lang.get(c.message.chat.id, 'ru'))
     audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
 
     await bot.edit_message_media(
