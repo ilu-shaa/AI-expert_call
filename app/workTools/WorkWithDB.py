@@ -1,6 +1,6 @@
 import json
 import os
-from app.config import DB_PATH
+from config import DB_PATH
 
 class WorkWithDB:
     @staticmethod

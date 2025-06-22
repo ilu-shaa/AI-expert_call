@@ -1,6 +1,6 @@
 import httpx
 import json
-from app.config import OPENROUTER_API_KEY
+from config import OPENROUTER_API_KEY
 
 class MistralAPI:
     @staticmethod

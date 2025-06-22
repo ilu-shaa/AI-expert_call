@@ -1,6 +1,6 @@
 import os
 
-TG_TOKEN = "6656018754:AAEiySDxp4qF-DxZqG-d-Mk2od0k4ljGGBY"
+TG_TOKEN = "7271971277:AAF5PDe1EBQmELvTjWHFwH3Yd2DTFkJg4xE"
 
 BASE_DIR = os.path.dirname(__file__)
 DB_PATH = os.path.join(BASE_DIR, 'static_files', 'db.json')

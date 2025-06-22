@@ -1,6 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
-from app.config import LLAMA2_PATH
+from config import LLAMA2_PATH
 
 class LlamaComparator:
     def __init__(self):

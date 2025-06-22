@@ -5,11 +5,11 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from app.keyboards.start_keyboard import lang_menu, start, back_to_start
-from app.static_files.bot_answers import GREETINGS
-from app.workTools.WorkWithDB import WorkWithDB
-from app.workTools.WorkWithTTS import WorkWithTTS
-from app.workTools.WorkWithLLM import MistralAPI
+from keyboards.start_keyboard import lang_menu, start, back_to_start
+from static_files.bot_answers import GREETINGS
+from workTools.WorkWithDB import WorkWithDB
+from workTools.WorkWithTTS import WorkWithTTS
+from workTools.WorkWithLLM import MistralAPI
 
 # FSM состояния
 class Flag(StatesGroup):
@@ -20,13 +20,13 @@ router = Router()
 
 @router.message(Command('start'))
 async def cmd_start(msg: Message):
-    from app.new_voice_handler import chat_lang
+    from new_voice_handler import chat_lang
     chat_lang.pop(msg.chat.id, None)
     await msg.answer(GREETINGS, reply_markup=lang_menu)
 
 @router.callback_query(F.data.startswith('set_lang:'))
 async def set_lang(c: CallbackQuery):
-    from app.new_voice_handler import chat_lang
+    from new_voice_handler import chat_lang
     lang = c.data.split(':')[1]
     chat_lang[c.message.chat.id] = lang
     confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
@@ -34,7 +34,7 @@ async def set_lang(c: CallbackQuery):
 
 @router.callback_query(F.data=='performance')
 async def show_intro(c: CallbackQuery):
-    from app.new_voice_handler import chat_lang
+    from new_voice_handler import chat_lang
     text = 'Добрый день! Я ваш ИИ‑ассистент по VTOL‑дронам. Вот презентация продукта.'
     audio = WorkWithTTS.text_to_speech(text, chat_lang.get(c.message.chat.id, 'ru'))
     await c.message.answer_audio(audio=audio)
@@ -99,7 +99,7 @@ async def ask_tts(c: CallbackQuery, state: FSMContext):
 
 @router.message(Flag.awaiting_tts_text)
 async def gen_tts(m: Message, state: FSMContext):
-    from app.new_voice_handler import chat_lang
+    from new_voice_handler import chat_lang
     text = m.text or ''
     await state.clear()
     audio = WorkWithTTS.text_to_speech(text, chat_lang.get(m.chat.id, 'ru'))

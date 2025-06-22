@@ -1,5 +1,5 @@
 import httpx
-from app.config import OPENROUTER_API_KEY
+from config import OPENROUTER_API_KEY
 
 class MistralAPI:
     ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
