@@ -30,5 +30,3 @@ class WorkWithCache:
             data = json.load(file)
 
         return base64.b64decode(data[key][0]), data[key][1]
-
-print(WorkWithCache.check_key("asd"))
