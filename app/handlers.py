@@ -1,12 +1,15 @@
-
 import httpx
-from aiogram import Router, F
+from translate import Translator
+
+from aiogram import Router, F, Bot
 from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, BufferedInputFile, InputMediaAudio, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from keyboards.start_keyboard import lang_menu, start, back_to_start
-from static_files.bot_answers import GREETINGS
+
+from keyboards.start_keyboard import lang_menu, start, back_to_start, back_to_start_delete
+from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES
+
 from workTools.WorkWithDB import WorkWithDB
 from workTools.WorkWithTTS import WorkWithTTS
 from workTools.WorkWithLLM import MistralAPI
@@ -32,13 +35,35 @@ async def set_lang(c: CallbackQuery):
     confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
     await c.message.edit_text(confirm, reply_markup=start)
 
-@router.callback_query(F.data=='performance')
-async def show_intro(c: CallbackQuery):
+@router.callback_query(F.data == 'performance')
+async def show_intro(c: CallbackQuery, bot: Bot):
     from new_voice_handler import chat_lang
-    text = 'Добрый день! Я ваш ИИ‑ассистент по VTOL‑дронам. Вот презентация продукта.'
-    audio = WorkWithTTS.text_to_speech(text, chat_lang.get(c.message.chat.id, 'ru'))
-    await c.message.answer_audio(audio=audio)
-    await c.message.answer(text, reply_markup=back_to_start)
+
+    #parts = [PRESENTAION_VTOL_DRONES[i:i+499] for i in range(0, len(PRESENTAION_VTOL_DRONES), 499)]
+    
+    translator = Translator(from_lang='russian', to_lang='english')
+    text = translator.translate(PRESENTAION_VTOL_DRONES)
+
+    audio_bytes = WorkWithTTS.text_to_speech(text, chat_lang.get(c.message.chat.id, 'ru'))
+    audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
+
+    await bot.edit_message_media(
+            chat_id = c.message.chat.id,
+            message_id = c.message.message_id,
+            media = InputMediaAudio(
+                media = audio,
+                caption = text #TODO: текст с представлением продукта
+            ),
+            reply_markup = back_to_start_delete
+        )
+
+@router.callback_query(F.data == 'backStartDelete')
+async def back_to_start(c: CallbackQuery):
+    from new_voice_handler import chat_lang
+    lang = chat_lang[c.message.chat.id]
+    confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
+    await c.message.delete()
+    await c.message.answer(confirm, reply_markup = start)
 
 @router.callback_query(F.data=='features')
 async def show_feats(c: CallbackQuery):

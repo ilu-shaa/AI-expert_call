@@ -13,4 +13,4 @@ class WorkWithTTS:
         mp3_fp = BytesIO()
         tts.write_to_fp(mp3_fp)
         mp3_fp.seek(0)
-        return mp3_fp
+        return mp3_fp.read()
