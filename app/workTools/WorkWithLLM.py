@@ -1,13 +1,13 @@
 import httpx
 import json
-from config import OPENROUTER_API_KEY
+# from app.config import OPENROUTER_API_KEY
 
 class MistralAPI:
     @staticmethod
-    async def query(prompt: str, system: str = "You are a VTOL‑drone expert.") -> str:
+    async def query(token, prompt: str, system: str = "You are a VTOL‑drone expert.") -> str: # добавил токен
         url = "https://openrouter.ai/api/v1/chat/completions"
         headers = {
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://yourdomain.com",  # Укажи свой домен
             "X-Title": "VTOL Drone Expert Bot"

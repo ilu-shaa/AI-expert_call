@@ -1,11 +1,12 @@
 import httpx
-from translate import Translator
 
 from aiogram import Router, F, Bot
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, BufferedInputFile, InputMediaAudio, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
+
+from config import OPENROUTER_API_KEY
 
 from keyboards.start_keyboard import lang_menu, start, back_to_start, back_to_start_delete
 from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES
@@ -39,10 +40,7 @@ async def set_lang(c: CallbackQuery):
 async def show_intro(c: CallbackQuery, bot: Bot):
     from new_voice_handler import chat_lang
 
-    #parts = [PRESENTAION_VTOL_DRONES[i:i+499] for i in range(0, len(PRESENTAION_VTOL_DRONES), 499)]
-    
-    translator = Translator(from_lang='russian', to_lang='english')
-    text = translator.translate(PRESENTAION_VTOL_DRONES)
+    text = await MistralAPI.query(prompt = f"Переведи с русского на {chat_lang.get(c.message.chat.id, 'ru')} {PRESENTAION_VTOL_DRONES}", token = OPENROUTER_API_KEY)
 
     audio_bytes = WorkWithTTS.text_to_speech(text, chat_lang.get(c.message.chat.id, 'ru'))
     audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
@@ -52,7 +50,7 @@ async def show_intro(c: CallbackQuery, bot: Bot):
             message_id = c.message.message_id,
             media = InputMediaAudio(
                 media = audio,
-                caption = text #TODO: текст с представлением продукта
+                caption = text
             ),
             reply_markup = back_to_start_delete
         )
