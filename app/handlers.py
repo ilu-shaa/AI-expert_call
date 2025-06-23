@@ -88,8 +88,8 @@ async def show_cert(c: CallbackQuery):
 # Переход в режим Q&A
 @router.callback_query(F.data=='question')
 async def enter_qa(c: CallbackQuery, state: FSMContext):
-    await state.set_state(Flag.awaiting_question)
-    await c.message.answer('❓ Задайте свой вопрос текстом или голосом.', reply_markup=back_to_start)
+    await state.set_state(Flag.awaiting_question) 
+    await c.message.answer('Задайте свой вопрос текстом или голосом.') # reply_markup=back_to_start
 
 # Обработка вопроса только через MistralAPI
 @router.message(Flag.awaiting_question)
@@ -103,22 +103,23 @@ async def handle_question(m: Message, state: FSMContext):
     # Простая локальная проверка суперлативов
     uq = user_question.lower()
     if 'самый быстрый' in uq:
-        best = max(db.items(), key=lambda item: item[1]['performance'].get('max_speed_kmh', 0))
+        best = max(db.items(), key=lambda item: item[1].get('performance', {}).get('max_speed_kmh', 0)) #item: item[1]['performance'].get('max_speed_kmh', 0)
         name, specs = best
-        speed = specs['performance']['max_speed_kmh']
-        await m.answer(f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.", reply_markup=back_to_start)
+        speed = specs['performance']['max_speed_kmh'] 
+        await m.answer(f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.") # reply_markup=back_to_start
         return
 
     # Формируем контекстовую строку
     context = ' '.join(
-        f"{name}: payload {info['weights']['max_payload_kg']}kg, speed {info['performance']['max_speed_kmh']}km/h;"
+        # f"{name}: payload {info['weights']['max_payload_kg']}kg, speed {info['performance']['max_speed_kmh']}km/h;"
+        f"{name}: payload {info.get('weights', {}).get('max_payload_kg', 'нет данных')}kg, speed {info.get('performance', {}.get('max_speed_kmh', 'нет данных'))}km/h;"
         for name, info in db.items()
     )
     # Запрос к MistralAPI
     prompt = f"Context: {context}\nQuestion: {user_question}"
-    answer = await MistralAPI.query(prompt)
+    answer = await MistralAPI.query(prompt = prompt, token = OPENROUTER_API_KEY)
 
-    await m.answer(f"❓ {user_question}\n\n💬 {answer}", reply_markup=back_to_start)
+    await m.answer(f"❓ {user_question}\n\n💬 {answer}") # reply_markup=back_to_start
 
 # Озвучка произвольного текста
 @router.callback_query(F.data=='voiceActing')
