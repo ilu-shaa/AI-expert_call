@@ -78,12 +78,12 @@ async def show_feats(c: CallbackQuery):
         f"⏱️ Время полёта: {p.get('flight_time_min','?')} мин\n"
         f"📶 Радиус: {p.get('max_range_km','?')} км"
     )
-    await c.message.answer(out, reply_markup=back_to_start)
+    await c.message.answer(out) # reply_markup=back_to_start
 
 @router.callback_query(F.data=='certificate')
 async def show_cert(c: CallbackQuery):
     docs = WorkWithDB.show_characteristics('JOUAV CW-15').get('compliance_documents', [])
-    await c.message.answer('🛂 Сертификаты и документы:\n' + '\n'.join(docs), reply_markup=back_to_start)
+    await c.message.answer('🛂 Сертификаты и документы:\n' + '\n'.join(docs)) # reply_markup=back_to_start
 
 # Переход в режим Q&A
 @router.callback_query(F.data=='question')
