@@ -38,31 +38,6 @@ async def set_lang(c: CallbackQuery):
     confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
     await c.message.edit_text(confirm, reply_markup=start)
 
-# @router.callback_query(F.data.startswith("presentaion_"))
-# async def show_intro(c: CallbackQuery, bot: Bot):
-#     from new_voice_handler import chat_lang
-
-#     cache_key = c.data + chat_lang.get(c.message.chat.id, 'ru')
-#     check_key = WorkWithCache.check_key(cache_key)
-#     if check_key:
-#         audio_bytes, text = WorkWithCache.get_cache(cache_key)
-#     else:
-#         text = await MistralAPI.query(prompt = f"Сгенерируй краткое представление дрона {c.data.split('_')[1]} на {chat_lang.get(c.message.chat.id, 'ru')} языке ", token = OPENROUTER_API_KEY)
-#         audio_bytes = await WorkWithTTS.text_to_speech(task = cache_key, text = text, lang = chat_lang.get(c.message.chat.id, 'ru'))
-
-#     audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
-
-#     await bot.edit_message_media(
-#             chat_id = c.message.chat.id,
-#             message_id = c.message.message_id,
-#             media = InputMediaAudio(
-#                 media = audio,
-#                 caption = text
-#             ),
-#             reply_markup = await kb.inline_words_phrases() # back_to_start_delete 
-#         )
-
-
 @router.callback_query(F.data == 'performance')
 @router.callback_query(F.data.startswith("presentaion_"))
 async def show_intro(c: CallbackQuery, bot: Bot):
@@ -93,33 +68,6 @@ async def show_intro(c: CallbackQuery, bot: Bot):
             ),
             reply_markup = await kb.inline_words_phrases() # back_to_start_delete 
         )
-
-
-
-
-# @router.callback_query(F.data == 'performance')
-# async def show_intro(c: CallbackQuery, bot: Bot):
-#     from new_voice_handler import chat_lang
-
-#     cache_key = 'presentaion' + chat_lang.get(c.message.chat.id, 'ru')
-#     check_key = WorkWithCache.check_key(cache_key)
-#     if check_key:
-#         audio_bytes, text = WorkWithCache.get_cache(cache_key)
-#     else:
-#         text = await MistralAPI.query(prompt = f"Переведи с русского на {chat_lang.get(c.message.chat.id, 'ru')} {PRESENTAION_VTOL_DRONES}", token = OPENROUTER_API_KEY)
-#         audio_bytes = await WorkWithTTS.text_to_speech(task = 'presentaion', text = text, lang = chat_lang.get(c.message.chat.id, 'ru'))
-
-#     audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
-
-#     await bot.edit_message_media(
-#             chat_id = c.message.chat.id,
-#             message_id = c.message.message_id,
-#             media = InputMediaAudio(
-#                 media = audio,
-#                 caption = text
-#             ),
-#             reply_markup = await kb.inline_words_phrases() # back_to_start_delete 
-#         )
 
 @router.callback_query(F.data == 'backStartDelete')
 async def back_to_start(c: CallbackQuery):
