@@ -13,7 +13,7 @@ class WorkWithTTS:
             'cn': 'zh-CN'
         }
 
-        cache_key = task + lang
+        cache_key = task # task + lang
 
         def block():
             tts = gTTS(text=text, lang=lang_map.get(lang, 'ru'))
