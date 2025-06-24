@@ -8,7 +8,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 from config import OPENROUTER_API_KEY
 
-from keyboards.start_keyboard import lang_menu, back_to_start, start_kb
+from keyboards.start_keyboard import lang_menu, back_to_start, back_to_start_delete, start_kb
 import keyboards.drone_presentation as kb
 from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES, CERTIFICATE, FEATURES
 
@@ -104,7 +104,8 @@ async def enter_qa(c: CallbackQuery, state: FSMContext):
 
 # Обработка вопроса только через MistralAPI
 @router.message(Flag.awaiting_question)
-async def handle_question(m: Message, state: FSMContext):
+async def handle_question(m: Message, state: FSMContext, bot: Bot):
+    from new_voice_handler import chat_lang
     await state.clear()
     user_question = m.text.strip()
 
@@ -117,7 +118,11 @@ async def handle_question(m: Message, state: FSMContext):
         best = max(db.items(), key=lambda item: item[1].get('performance', {}).get('max_speed_kmh', 0)) #item: item[1]['performance'].get('max_speed_kmh', 0)
         name, specs = best
         speed = specs['performance']['max_speed_kmh'] 
-        await m.answer(f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.") # reply_markup=back_to_start
+
+        audio_bytes = await WorkWithTTS.text_to_speech(task = "answer-question", text = f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.", lang = chat_lang.get(m.chat.id, 'ru'))
+        audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
+        await m.answer_audio(audio = audio, caption = f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.")
+        #await m.answer(f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.") # reply_markup=back_to_start
         return
 
     # Формируем контекстовую строку
@@ -130,7 +135,20 @@ async def handle_question(m: Message, state: FSMContext):
     prompt = f"Context: {context}\nQuestion: {user_question}"
     answer = await MistralAPI.query(prompt = prompt, token = OPENROUTER_API_KEY)
 
-    await m.answer(f"❓ {user_question}\n\n💬 {answer}") # reply_markup=back_to_start
+    audio_bytes = await WorkWithTTS.text_to_speech(task = "answer-question", text = answer, lang = chat_lang.get(m.chat.id, 'ru'))
+    audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
+
+    # await bot.edit_message_media(
+    #         chat_id = m.chat.id,
+    #         message_id = m.message_id,
+    #         media = InputMediaAudio(
+    #             media = audio,
+    #             caption = answer
+    #         ),
+    #         reply_markup = back_to_start_delete  # back_to_start_delete 
+    #     )
+    await m.answer_audio(audio = audio, caption = answer)
+    #await m.answer(f"❓ {user_question}\n\n💬 {answer}") # reply_markup=back_to_start
 
 # Озвучка произвольного текста
 @router.callback_query(F.data=='voiceActing')
