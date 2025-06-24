@@ -8,9 +8,9 @@ from aiogram.fsm.state import StatesGroup, State
 
 from config import OPENROUTER_API_KEY
 
-from keyboards.start_keyboard import lang_menu, start, back_to_start, back_to_start_delete
+from keyboards.start_keyboard import lang_menu, back_to_start, start_kb
 import keyboards.drone_presentation as kb
-from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES
+from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES, CERTIFICATE, FEATURES
 
 from workTools.WorkWithDB import WorkWithDB
 from workTools.WorkWithTTS import WorkWithTTS
@@ -36,18 +36,17 @@ async def set_lang(c: CallbackQuery):
     lang = c.data.split(':')[1]
     chat_lang[c.message.chat.id] = lang
     confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
-    await c.message.edit_text(confirm, reply_markup=start)
+    await c.message.edit_text(confirm, reply_markup = await start_kb(chat_lang.get(c.message.chat.id, 'ru')))
 
 @router.callback_query(F.data == 'performance')
 @router.callback_query(F.data.startswith("presentaion_"))
 async def show_intro(c: CallbackQuery, bot: Bot):
     from new_voice_handler import chat_lang
-    print(c.data)
     cache_key = c.data + chat_lang.get(c.message.chat.id, 'ru') if not c.data == 'performance' else 'presentaion' + chat_lang.get(c.message.chat.id, 'ru')
-    print(cache_key)
     check_key = WorkWithCache.check_key(cache_key)
     if check_key:
         print("Данные из кэша")
+        print(cache_key)
         audio_bytes, text = WorkWithCache.get_cache(cache_key)
     else:
         print("Данные не из кэша")
@@ -75,23 +74,27 @@ async def back_to_start(c: CallbackQuery):
     lang = chat_lang[c.message.chat.id]
     confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
     await c.message.delete()
-    await c.message.answer(confirm, reply_markup = start)
+    await c.message.answer(confirm, reply_markup = await start_kb(chat_lang.get(c.message.chat.id, 'ru')))
 
 @router.callback_query(F.data=='features')
 async def show_feats(c: CallbackQuery):
+    from new_voice_handler import chat_lang
     data = WorkWithDB.show_characteristics('JOUAV CW-15')
     p = data.get('performance', {})
+    features = FEATURES[chat_lang.get(c.message.chat.id, 'ru')]
     out = (
-        f"🏎️ Скорость: {p.get('max_speed_kmh','?')} км/ч\n"
-        f"⏱️ Время полёта: {p.get('flight_time_min','?')} мин\n"
-        f"📶 Радиус: {p.get('max_range_km','?')} км"
+        f"🏎️ {features[0][0]} {p.get('max_speed_kmh','?')} {features[0][1]}\n"
+        f"⏱️ {features[1][0]} {p.get('flight_time_min','?')} {features[1][1]}\n"
+        f"📶 {features[2][0]} {p.get('max_range_km','?')} {features[2][1]}"
     )
     await c.message.answer(out) # reply_markup=back_to_start
 
 @router.callback_query(F.data=='certificate')
 async def show_cert(c: CallbackQuery):
+    from new_voice_handler import chat_lang
+    certificate = CERTIFICATE[chat_lang.get(c.message.chat.id, 'ru')]
     docs = WorkWithDB.show_characteristics('JOUAV CW-15').get('compliance_documents', [])
-    await c.message.answer('🛂 Сертификаты и документы:\n' + '\n'.join(docs)) # reply_markup=back_to_start
+    await c.message.answer(f'🛂 {certificate}\n' + '\n'.join(docs)) # reply_markup=back_to_start
 
 # Переход в режим Q&A
 @router.callback_query(F.data=='question')
