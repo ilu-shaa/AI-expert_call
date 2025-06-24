@@ -1,7 +1,10 @@
 import httpx
+import os
+import tempfile
+import whisper
 
 from aiogram import Router, F, Bot
-from aiogram.filters import Command
+from aiogram.filters import Command, BaseFilter
 from aiogram.types import Message, CallbackQuery, BufferedInputFile, InputMediaAudio, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -23,6 +26,21 @@ class Flag(StatesGroup):
     awaiting_tts_text = State()
 
 router = Router()
+
+_whisper_model = None
+
+# Команды выбора языка
+LANG_COMMANDS = {
+    'ru': 'lang_ru',
+    'en': 'lang_en',
+    'cn': 'lang_cn'
+}
+# Коды языка для whisper
+WHISPER_LANG = {
+    'ru': 'ru',
+    'en': 'en',
+    'cn': 'zh'
+}
 
 @router.message(Command('start'))
 async def cmd_start(msg: Message):
@@ -102,12 +120,57 @@ async def enter_qa(c: CallbackQuery, state: FSMContext):
     await state.set_state(Flag.awaiting_question) 
     await c.message.answer('Задайте свой вопрос текстом или голосом.') # reply_markup=back_to_start
 
+def get_whisper_model():
+    global _whisper_model
+    if _whisper_model is None:
+        # используем компактную модель для скорости
+        _whisper_model = whisper.load_model('tiny')
+    return _whisper_model
+
+# Хендлеры для установки языка
+for code, cmd in LANG_COMMANDS.items():
+    async def _set_lang(msg: Message, code=code):
+        from new_voice_handler import chat_lang
+        chat_lang[msg.chat.id] = code
+        names = {'ru': 'Русский', 'en': 'English', 'cn': '中文'}
+        await msg.answer(f"Язык распознавания установлен: {names[code]}")
+    router.message(Command(cmd))(_set_lang)
+
 # Обработка вопроса только через MistralAPI
 @router.message(Flag.awaiting_question)
 async def handle_question(m: Message, state: FSMContext, bot: Bot):
     from new_voice_handler import chat_lang
     await state.clear()
-    user_question = m.text.strip()
+
+    try:
+        user_question = m.text.strip()
+    except:
+        lang = chat_lang.get(m.chat.id, 'ru')
+
+        # скачать голосовое сообщение во временный файл
+        with tempfile.NamedTemporaryFile(suffix='.ogg', delete=False) as tmp:
+            await m.bot.download(m.voice.file_id, tmp.name)
+            audio_path = tmp.name
+
+        try:
+            model = get_whisper_model()
+            # транскрипция
+            result = model.transcribe(audio_path, language=WHISPER_LANG.get(lang, 'en'))
+            text = result.get('text', '').strip()
+        except Exception as e:
+            text = ''
+        finally:
+            try:
+                os.remove(audio_path)
+            except OSError:
+                pass
+
+        if not text:
+            await m.answer("❗️ Не удалось распознать речь.")
+            return
+
+        # отправка результата
+        user_question = text.strip()
 
     # Загружаем весь контекст из БД
     db = WorkWithDB.load_all()  # вернёт dict {name: specs}
@@ -139,7 +202,6 @@ async def handle_question(m: Message, state: FSMContext, bot: Bot):
     audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
 
     await m.answer_audio(audio = audio, caption = answer)
-    #await m.answer(f"❓ {user_question}\n\n💬 {answer}") # reply_markup=back_to_start
 
 # Озвучка произвольного текста
 @router.callback_query(F.data=='voiceActing')
