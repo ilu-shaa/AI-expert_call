@@ -64,7 +64,6 @@ async def show_intro(c: CallbackQuery, bot: Bot):
     check_key = WorkWithCache.check_key(cache_key)
     if check_key:
         print("Данные из кэша")
-        print(cache_key)
         audio_bytes, text = WorkWithCache.get_cache(cache_key)
     else:
         print("Данные не из кэша")
