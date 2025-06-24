@@ -133,20 +133,11 @@ async def handle_question(m: Message, state: FSMContext, bot: Bot):
     )
     # Запрос к MistralAPI
     prompt = f"Context: {context}\nQuestion: {user_question}"
-    answer = await MistralAPI.query(prompt = prompt, token = OPENROUTER_API_KEY)
+    answer = await MistralAPI.query(prompt = f"{prompt} отвечай кратко и на том языке на котором написан вопрос", token = OPENROUTER_API_KEY)
 
     audio_bytes = await WorkWithTTS.text_to_speech(task = "answer-question", text = answer, lang = chat_lang.get(m.chat.id, 'ru'))
     audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
 
-    # await bot.edit_message_media(
-    #         chat_id = m.chat.id,
-    #         message_id = m.message_id,
-    #         media = InputMediaAudio(
-    #             media = audio,
-    #             caption = answer
-    #         ),
-    #         reply_markup = back_to_start_delete  # back_to_start_delete 
-    #     )
     await m.answer_audio(audio = audio, caption = answer)
     #await m.answer(f"❓ {user_question}\n\n💬 {answer}") # reply_markup=back_to_start
 
