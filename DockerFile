@@ -1,20 +1,18 @@
 FROM python:3.11.0-slim
 
-# Устанавливаем ffmpeg и обновляем пакеты
-RUN apt-get update && apt-get install -y ffmpeg
+# Обновляем пакеты, устанавливаем ffmpeg и git
+RUN apt-get update && apt-get install -y ffmpeg git
 
-# Устанавливаем PyTorch CPU-версию и Whisper из репозитория
+# Устанавливаем pip, PyTorch CPU-версию и Whisper из репозитория
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu \
     && pip install --no-cache-dir git+https://github.com/openai/whisper.git
 
 WORKDIR /app
 
-# Копируем все файлы проекта в контейнер
 COPY . .
 
-# Устанавливаем зависимости из requirements.txt (если есть)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Запуск приложения
 CMD ["python", "app/main.py"]
+
