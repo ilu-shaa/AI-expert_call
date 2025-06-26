@@ -1,217 +1,254 @@
-import httpx
+# app/handlers.py
+
+import json
 import os
 import tempfile
 import whisper
-
-from aiogram import Router, F, Bot
-from aiogram.filters import Command, BaseFilter
-from aiogram.types import Message, CallbackQuery, BufferedInputFile, InputMediaAudio, FSInputFile
+import ollama
+from aiogram import Router, F
+from aiogram.filters import Command
+from aiogram.types import (
+    Message, CallbackQuery, BufferedInputFile,
+    InlineKeyboardMarkup, InlineKeyboardButton
+)
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from config import OPENROUTER_API_KEY
+from app.config import OPENROUTER_API_KEY
+from app.keyboards.start_keyboard import lang_menu, start_kb, back_to_start
+from app.static_files.bot_answers import GREETINGS, CERTIFICATE
+from app.new_voice_handler import chat_lang, WHISPER_LANG
+from app.workTools.WorkWithDB import WorkWithDB
+from app.workTools.WorkWithTTS import WorkWithTTS
+from app.workTools.WorkWithLLM import MistralAPI
+from app.workTools.WorkWithCache import WorkWithCache
+from app.workTools.search_db import search_db
 
-from keyboards.start_keyboard import lang_menu, back_to_start, back_to_start_delete, start_kb
-import keyboards.drone_presentation as kb
-from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES, CERTIFICATE, FEATURES
-
-from workTools.WorkWithDB import WorkWithDB
-from workTools.WorkWithTTS import WorkWithTTS
-from workTools.WorkWithLLM import MistralAPI
-from workTools.WorkWithCache import WorkWithCache
-
-# FSM состояния
+# FSM states
 class Flag(StatesGroup):
     awaiting_question = State()
     awaiting_tts_text = State()
+    awaiting_compare_selection = State()
 
 router = Router()
-
 _whisper_model = None
 
-# Команды выбора языка
-LANG_COMMANDS = {
-    'ru': 'lang_ru',
-    'en': 'lang_en',
-    'cn': 'lang_cn'
-}
-# Коды языка для whisper
-WHISPER_LANG = {
-    'ru': 'ru',
-    'en': 'en',
-    'cn': 'zh'
-}
+def get_whisper_model():
+    global _whisper_model
+    if _whisper_model is None:
+        _whisper_model = whisper.load_model('tiny')
+    return _whisper_model
 
+# -------------------
+# /start и выбор языка
+# -------------------
 @router.message(Command('start'))
 async def cmd_start(msg: Message):
-    from new_voice_handler import chat_lang
     chat_lang.pop(msg.chat.id, None)
     await msg.answer(GREETINGS, reply_markup=lang_menu)
 
 @router.callback_query(F.data.startswith('set_lang:'))
 async def set_lang(c: CallbackQuery):
-    from new_voice_handler import chat_lang
-    lang = c.data.split(':')[1]
+    lang = c.data.split(':', 1)[1]
     chat_lang[c.message.chat.id] = lang
     confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
-    await c.message.edit_text(confirm, reply_markup = await start_kb(chat_lang.get(c.message.chat.id, 'ru')))
+    await c.message.edit_text(confirm, reply_markup=await start_kb(lang))
 
+# -------------------
+# Презентация / Комплектация
+# -------------------
 @router.callback_query(F.data == 'performance')
 @router.callback_query(F.data.startswith("presentaion_"))
-async def show_intro(c: CallbackQuery, bot: Bot):
-    from new_voice_handler import chat_lang
-    cache_key = c.data + chat_lang.get(c.message.chat.id, 'ru') if not c.data == 'performance' else 'presentaion' + chat_lang.get(c.message.chat.id, 'ru')
-    check_key = WorkWithCache.check_key(cache_key)
-    if check_key:
-        print("Данные из кэша")
-        audio_bytes, text = WorkWithCache.get_cache(cache_key)
+async def show_intro(c: CallbackQuery):
+    lang = chat_lang.get(c.message.chat.id, 'ru')
+    key = f"{c.data}_{lang}"
+    if WorkWithCache.check_key(key):
+        audio_bytes, text = WorkWithCache.get_cache(key)
     else:
-        print("Данные не из кэша")
+        drone = None
         if c.data == 'performance':
-            text = await MistralAPI.query(prompt = f"Переведи с русского на {chat_lang.get(c.message.chat.id, 'ru')} {PRESENTAION_VTOL_DRONES}", token = OPENROUTER_API_KEY)
+            template = {
+                'ru': "Дайте краткий перевод презентации VTOL-дронов на русский.",
+                'en': "Provide a short translation of the VTOL drone presentation into English.",
+                'cn': "请将VTOL无人机的介绍简短地翻译成中文。"
+            }[lang]
         else:
-            text = await MistralAPI.query(prompt = f"Сгенерируй краткое представление дрона (чтобы по размеру вместилось в сообщение в телеграмм) {c.data.split('_')[1]} на {chat_lang.get(c.message.chat.id, 'ru')} языке ", token = OPENROUTER_API_KEY)
-        audio_bytes = await WorkWithTTS.text_to_speech(task = cache_key, text = text, lang = chat_lang.get(c.message.chat.id, 'ru'))
+            drone = c.data.split('_',1)[1]
+            template = {
+                'ru': f"Сократите до 2 предложений описание дрона {drone} на русском.",
+                'en': f"Summarize in 2 sentences a description of {drone} in English.",
+                'cn': f"用2句话简要描述{drone}。"
+            }[lang]
 
-    audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
-
-    await bot.edit_message_media(
-            chat_id = c.message.chat.id,
-            message_id = c.message.message_id,
-            media = InputMediaAudio(
-                media = audio,
-                caption = text
-            ),
-            reply_markup = await kb.inline_words_phrases() # back_to_start_delete 
+        text = await MistralAPI.query(
+            prompt=template,
+            system=f"Вы — эксперт для {lang}-клиента.",
+            max_tokens=100
         )
+        audio_bytes = await WorkWithTTS.text_to_speech(task=key, text=text, lang=lang)
+        WorkWithCache.append_cache(key, audio_bytes, text)
 
-@router.callback_query(F.data == 'backStartDelete')
-async def back_to_start(c: CallbackQuery):
-    from new_voice_handler import chat_lang
-    lang = chat_lang[c.message.chat.id]
-    confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
-    await c.message.delete()
-    await c.message.answer(confirm, reply_markup = await start_kb(chat_lang.get(c.message.chat.id, 'ru')))
+    await c.message.answer(text)
+    await c.message.answer_audio(BufferedInputFile(audio_bytes, filename="intro.mp3"))
 
-@router.callback_query(F.data=='features')
-async def show_feats(c: CallbackQuery):
-    from new_voice_handler import chat_lang
-    data = WorkWithDB.show_characteristics('JOUAV CW-15')
-    p = data.get('performance', {})
-    features = FEATURES[chat_lang.get(c.message.chat.id, 'ru')]
-    out = (
-        f"🏎️ {features[0][0]} {p.get('max_speed_kmh','?')} {features[0][1]}\n"
-        f"⏱️ {features[1][0]} {p.get('flight_time_min','?')} {features[1][1]}\n"
-        f"📶 {features[2][0]} {p.get('max_range_km','?')} {features[2][1]}"
-    )
-    await c.message.answer(out) # reply_markup=back_to_start
+# -------------------
+# Характеристики: список дронов и выбор модели
+# -------------------
+@router.callback_query(F.data == 'features')
+async def features_list(c: CallbackQuery):
+    names = list(WorkWithDB.load_all().keys())
+    buttons = [InlineKeyboardButton(text=n, callback_data=f"feat:{n}") for n in names]
+    kb = InlineKeyboardMarkup(inline_keyboard=[buttons[i:i+2] for i in range(0, len(buttons), 2)])
+    await c.message.answer("Выберите модель для просмотра характеристик:", reply_markup=kb)
 
-@router.callback_query(F.data=='certificate')
+@router.callback_query(F.data.startswith("feat:"))
+async def show_features(c: CallbackQuery):
+    name = c.data.split(":",1)[1]
+    specs = WorkWithDB.show_characteristics(name)
+    lines = [f"📌 <b>{name}</b>"]
+    for section in ("performance", "weights", "dimensions"):
+        data = specs.get(section, {})
+        if data:
+            lines.append(f"\n<b>{section.title()}:</b>")
+            for k,v in data.items():
+                lines.append(f"• {k}: {v}")
+    docs = specs.get("compliance_documents", [])
+    if docs:
+        lines.append("\n<b>Документы соответствия:</b>")
+        for d in docs:
+            lines.append(f"• {d}")
+
+    text = "\n".join(lines)
+    await c.message.answer(text, parse_mode="HTML")
+
+# -------------------
+# Сертификаты
+# -------------------
+@router.callback_query(F.data == 'certificate')
 async def show_cert(c: CallbackQuery):
-    from new_voice_handler import chat_lang
-    certificate = CERTIFICATE[chat_lang.get(c.message.chat.id, 'ru')]
+    lang = chat_lang.get(c.message.chat.id, 'ru')
+    cert = CERTIFICATE[lang]
     docs = WorkWithDB.show_characteristics('JOUAV CW-15').get('compliance_documents', [])
-    await c.message.answer(f'🛂 {certificate}\n' + '\n'.join(docs)) # reply_markup=back_to_start
+    await c.message.answer(f"{cert}\n" + "\n".join(docs))
 
-# Переход в режим Q&A
-@router.callback_query(F.data=='question')
+# -------------------
+# Вход в Q&A
+# -------------------
+@router.callback_query(F.data == 'question')
 async def enter_qa(c: CallbackQuery, state: FSMContext):
-    await state.set_state(Flag.awaiting_question) 
-    await c.message.answer('Задайте свой вопрос текстом или голосом.') # reply_markup=back_to_start
+    await state.set_state(Flag.awaiting_question)
+    lang = chat_lang.get(c.message.chat.id, 'ru')
+    prompt_text = {
+        'ru': '❓ Задайте вопрос текстом или отправьте голосовое сообщение.',
+        'en': '❓ Ask your question by text or send a voice message.',
+        'cn': '❓ 请以文字提问或发送语音消息。'
+    }[lang]
+    await c.message.answer(prompt_text)
 
-def get_whisper_model():
-    global _whisper_model
-    if _whisper_model is None:
-        # используем компактную модель для скорости
-        _whisper_model = whisper.load_model('tiny')
-    return _whisper_model
-
-# Хендлеры для установки языка
-for code, cmd in LANG_COMMANDS.items():
-    async def _set_lang(msg: Message, code=code):
-        from new_voice_handler import chat_lang
-        chat_lang[msg.chat.id] = code
-        names = {'ru': 'Русский', 'en': 'English', 'cn': '中文'}
-        await msg.answer(f"Язык распознавания установлен: {names[code]}")
-    router.message(Command(cmd))(_set_lang)
-
-# Обработка вопроса только через MistralAPI
 @router.message(Flag.awaiting_question)
-async def handle_question(m: Message, state: FSMContext, bot: Bot):
-    from new_voice_handler import chat_lang
+async def handle_question(m: Message, state: FSMContext):
     await state.clear()
+    lang = chat_lang.get(m.chat.id, 'ru')
 
-    try:
-        user_question = m.text.strip()
-    except:
-        lang = chat_lang.get(m.chat.id, 'ru')
-
-        # скачать голосовое сообщение во временный файл
-        with tempfile.NamedTemporaryFile(suffix='.ogg', delete=False) as tmp:
+    if m.voice:
+        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as tmp:
             await m.bot.download(m.voice.file_id, tmp.name)
             audio_path = tmp.name
-
         try:
-            model = get_whisper_model()
-            # транскрипция
-            result = model.transcribe(audio_path, language=WHISPER_LANG.get(lang, 'en'))
-            text = result.get('text', '').strip()
-        except Exception as e:
-            text = ''
+            res = get_whisper_model().transcribe(audio_path, language=WHISPER_LANG.get(lang, 'en'))
+            user_question = res.get('text', '').strip()
+        except:
+            user_question = ''
         finally:
-            try:
-                os.remove(audio_path)
-            except OSError:
-                pass
+            try: os.remove(audio_path)
+            except: pass
 
-        if not text:
-            await m.answer("❗️ Не удалось распознать речь.")
-            return
+        if not user_question:
+            return await m.answer({
+                'ru': "❗️ Не удалось распознать речь.",
+                'en': "❗️ Could not transcribe audio.",
+                'cn': "❗️ 无法识别语音。"
+            }[lang])
+    else:
+        user_question = m.text or ""
 
-        # отправка результата
-        user_question = text.strip()
+    relevant = search_db(user_question, top_k=2)
+    context = "\n\n".join([f"{name}:\n{info}" for name, info in relevant])
+    system_prompt = {
+        'ru': "Ты — эксперт по VTOL-дронам. Используй только приведённую информацию для ответа.",
+        'en': "You are a VTOL drone expert. Use only the provided context to answer.",
+        'cn': "您是 VTOL 无人机专家。仅使用以下信息进行回答。"
+    }[lang]
 
-    # Загружаем весь контекст из БД
-    db = WorkWithDB.load_all()  # вернёт dict {name: specs}
-    
-    # Простая локальная проверка суперлативов
-    uq = user_question.lower()
-    if 'самый быстрый' in uq:
-        best = max(db.items(), key=lambda item: item[1].get('performance', {}).get('max_speed_kmh', 0)) #item: item[1]['performance'].get('max_speed_kmh', 0)
-        name, specs = best
-        speed = specs['performance']['max_speed_kmh'] 
+    prompt = f"{system_prompt}\n\nКонтекст:\n{context}\n\nВопрос: {user_question}"
 
-        audio_bytes = await WorkWithTTS.text_to_speech(task = "answer-question", text = f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.", lang = chat_lang.get(m.chat.id, 'ru'))
-        audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
-        await m.answer_audio(audio = audio, caption = f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.")
-        #await m.answer(f"🚀 Самый быстрый дрон: {name} — {speed} км/ч.") # reply_markup=back_to_start
-        return
+    answer = await MistralAPI.query(prompt=prompt, system=system_prompt, max_tokens=200)
+    answer = answer.strip()
+    if len(answer) > 1000:
+        answer = answer[:997] + "..."
 
-    # Формируем контекстовую строку
-    context = ' '.join(
-        # f"{name}: payload {info['weights']['max_payload_kg']}kg, speed {info['performance']['max_speed_kmh']}km/h;"
-        f"{name}: payload {info.get('weights', {}).get('max_payload_kg', 'нет данных')}kg, speed {info.get('performance', {}.get('max_speed_kmh', 'нет данных'))}km/h;"
-        for name, info in db.items()
-    )
-    # Запрос к MistralAPI
-    prompt = f"Context: {context}\nQuestion: {user_question}"
-    answer = await MistralAPI.query(prompt = prompt, token = OPENROUTER_API_KEY)
+    await m.answer(answer)
+    audio = await WorkWithTTS.text_to_speech(task="answer-question", text=answer, lang=lang)
+    await m.answer_audio(BufferedInputFile(audio, filename="answer.mp3"))
 
-    audio_bytes = await WorkWithTTS.text_to_speech(task = "answer-question", text = answer, lang = chat_lang.get(m.chat.id, 'ru'))
-    audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
+# -------------------
+# Компаратор: мультивыбор и сравнение
+# -------------------
+@router.callback_query(F.data == 'compare')
+async def ask_compare(c: CallbackQuery, state: FSMContext):
+    # Начинаем множественный выбор
+    await state.set_state(Flag.awaiting_compare_selection)
+    await state.update_data(compare_list=[])
+    await send_compare_keyboard(c, state)
 
-    await m.answer_audio(audio = audio, caption = answer)
+async def send_compare_keyboard(c: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    chosen = set(data.get('compare_list', []))
+    names = list(WorkWithDB.load_all().keys())
+    buttons = []
+    for n in names:
+        prefix = '✅ ' if n in chosen else '▫️ '
+        buttons.append(InlineKeyboardButton(
+            text=f"{prefix}{n}", callback_data=f"toggle:{n}"
+        ))
+    buttons.append(InlineKeyboardButton(
+        text="🔀 Сравнить", callback_data="run_compare"
+    ))
+    kb = InlineKeyboardMarkup(inline_keyboard=[buttons[i:i+2] for i in range(0, len(buttons), 2)])
+    try:
+        await c.message.edit_text("Выберите модели для сравнения (отметьте галочкой):", reply_markup=kb)
+    except:
+        await c.message.answer("Выберите модели для сравнения (отметьте галочкой):", reply_markup=kb)
 
-# Озвучка произвольного текста
-@router.callback_query(F.data=='voiceActing')
-async def ask_tts(c: CallbackQuery, state: FSMContext):
-    await state.set_state(Flag.awaiting_tts_text)
-    await c.message.answer('✍️ Напишите текст для озвучки.', reply_markup=back_to_start)
+@router.callback_query(F.data.startswith('toggle:'))
+async def toggle_model(c: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    chosen = set(data.get('compare_list', []))
+    model = c.data.split(':',1)[1]
+    if model in chosen:
+        chosen.remove(model)
+    else:
+        chosen.add(model)
+    await state.update_data(compare_list=list(chosen))
+    await send_compare_keyboard(c, state)
 
-@router.message(Flag.awaiting_tts_text)
-async def gen_tts(m: Message, state: FSMContext):
-    from new_voice_handler import chat_lang
-    text = m.text or ''
+@router.callback_query(F.data == 'run_compare')
+async def run_compare(c: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    chosen = data.get('compare_list', [])
+    if len(chosen) < 2:
+        return await c.message.answer("Для сравнения выберите как минимум две модели.")
+    db = WorkWithDB.load_all()
+    pairs = []
+    for name in chosen:
+        specs = json.dumps(db[name], ensure_ascii=False)
+        pairs.append(f"{name}: {specs}")
+    content = "; ".join(pairs)
+    msg = [{'role':'user', 'content': f"Сравните следующие VTOL-дроны по ключевым параметрам: {content}"}]
+    resp = ollama.chat(model='deepseek-r1:8b', messages=msg)
+    report = resp['message']['content']
+    lang = chat_lang.get(c.message.chat.id, 'ru')
+    await c.message.answer(report)
+    audio = await WorkWithTTS.text_to_speech(task='compare', text=report, lang=lang)
+    await c.message.answer_audio(BufferedInputFile(audio, filename='compare.mp3'))
     await state.clear()
-    audio = WorkWithTTS.text_to_speech(text, chat_lang.get(m.chat.id, 'ru'))
-    await m.answer_audio(audio=audio, reply_markup=back_to_start)

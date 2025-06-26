@@ -1,16 +1,16 @@
+# main.py
+
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from aiogram.client.bot import DefaultBotProperties
-from config import TG_TOKEN
-from handlers import router as main_router
-from new_voice_handler import router as voice_router
+
+from app.config import TG_TOKEN
+from app.handlers import router as main_router
+from app.new_voice_handler import router as voice_router
 
 async def main():
-    bot = Bot(
-        token=TG_TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-    )
+    # Инициализация бота с нужным parse_mode
+    bot = Bot(token=TG_TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
 
     # Подключаем маршрутизаторы
@@ -20,5 +20,5 @@ async def main():
     print("🚀 Bot is running...")
     await dp.start_polling(bot)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

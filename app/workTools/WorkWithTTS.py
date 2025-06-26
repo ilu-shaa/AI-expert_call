@@ -2,7 +2,7 @@ from gtts import gTTS
 from io import BytesIO
 import asyncio
 
-from workTools.WorkWithCache import WorkWithCache
+from app.workTools.WorkWithCache import WorkWithCache
 
 class WorkWithTTS:
     @staticmethod
