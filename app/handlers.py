@@ -83,7 +83,7 @@ async def compare_drones(c: CallbackQuery):
     await c.message.edit_text(answer_text, reply_markup = await kb_compare.drones2())
 
 @router.callback_query(F.data.startswith("compare2_"))
-async def compare_drones(c: CallbackQuery):
+async def compare_drones(c: CallbackQuery, bot: Bot):
     from new_voice_handler import chat_lang
 
     global compare_list
@@ -96,9 +96,23 @@ async def compare_drones(c: CallbackQuery):
     prompt = f"""Сравните два VTOL‑дрона по ключевым параметрам:
 Модель A: {str(compare_list[0])}, характеристики: {drone1_info}
 Модель B: {str(compare_list[1])}, характеристики: {drone2_info}
-Выделите, по каким параметрам какая модель лучше, и сделайте краткий вывод. Свой ответ дай на {chat_lang.get(c.message.chat.id, 'ru')} языке"""
+Выделите, по каким параметрам какая модель лучше, и сделайте краткий вывод (меньше 900 символов). Свой ответ дай на {chat_lang.get(c.message.chat.id, 'ru')} языке"""
     answer = await MistralAPI.query(OPENROUTER_API_KEY, prompt)
-    await c.message.edit_text(answer)
+
+    audio_bytes = await WorkWithTTS.text_to_speech(task = "compare", text = answer, lang = chat_lang.get(c.message.chat.id, 'ru'))
+    audio = BufferedInputFile(file = audio_bytes, filename = "voice.mp3")
+
+    await bot.edit_message_media(
+            chat_id = c.message.chat.id,
+            message_id = c.message.message_id,
+            media = InputMediaAudio(
+                media = audio,
+                caption = answer
+            ),
+            reply_markup = back_to_start_delete # back_to_start_delete 
+        )
+
+    # await c.message.edit_text(answer)
 
 @router.callback_query(F.data == 'performance')
 @router.callback_query(F.data.startswith("presentaion_"))

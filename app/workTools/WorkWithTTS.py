@@ -23,6 +23,6 @@ class WorkWithTTS:
             return mp3_fp.read()
 
         audio_bytes = await asyncio.to_thread(block)
-        if cache_key != "answer-question":
+        if cache_key != "answer-question" and cache_key != "compare":
             WorkWithCache.append_cache(cache_key, audio_bytes, text)
         return audio_bytes
