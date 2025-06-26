@@ -10,11 +10,11 @@ lang_menu = InlineKeyboardMarkup(inline_keyboard=[
     ]
 ])
 
-start_buttons = {"ru" : ["📣 Презентация", "📊 Характеристики", "📄 Сертификаты", "❓ Задать вопрос"],
-                 "en" : ["📣 Presentation", "📊 Characteristic", "📄 Certificates", "❓ Ask a question"],
-                 "cn" : ["📣 推介會", "📊 特徵", "📄 證書", "❓ 問一個問題"]}
+start_buttons = {"ru" : ["📣 Презентация", "📊 Характеристики", "📄 Сертификаты", "❓ Задать вопрос", "Сравнение"],
+                 "en" : ["📣 Presentation", "📊 Characteristic", "📄 Certificates", "❓ Ask a question", "Comparison"],
+                 "cn" : ["📣 推介會", "📊 特徵", "📄 證書", "❓ 問一個問題", "比較"]}
 
-start_callback = ["performance", "features", "certificate", "question"]
+start_callback = ["performance", "features", "certificate", "question", "compare"]
 
 async def start_kb(language: str):
     keyboard = InlineKeyboardBuilder()
