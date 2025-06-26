@@ -13,7 +13,8 @@ from config import OPENROUTER_API_KEY
 
 from keyboards.start_keyboard import lang_menu, back_to_start, back_to_start_delete, start_kb
 import keyboards.drone_presentation as kb
-from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES, CERTIFICATE, FEATURES
+import keyboards.drone_compare as kb_compare
+from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES, CERTIFICATE, FEATURES, COMPARE
 
 from workTools.WorkWithDB import WorkWithDB
 from workTools.WorkWithTTS import WorkWithTTS
@@ -26,6 +27,8 @@ class Flag(StatesGroup):
     awaiting_tts_text = State()
 
 router = Router()
+
+compare_list = []
 
 _whisper_model = None
 
@@ -55,6 +58,47 @@ async def set_lang(c: CallbackQuery):
     chat_lang[c.message.chat.id] = lang
     confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
     await c.message.edit_text(confirm, reply_markup = await start_kb(chat_lang.get(c.message.chat.id, 'ru')))
+
+@router.callback_query(F.data == "compare")
+async def compare_drones(c: CallbackQuery):
+    from new_voice_handler import chat_lang
+
+    global compare_list
+    compare_list.clear()
+
+    answer_text = COMPARE[chat_lang.get(c.message.chat.id, 'ru')].format(number = "1")
+
+    await c.message.edit_text(answer_text, reply_markup = await kb_compare.inline_words_phrases())
+
+@router.callback_query(F.data.startswith("compare1_"))
+async def compare_drones(c: CallbackQuery):
+    from new_voice_handler import chat_lang
+
+    global compare_list
+    drone_name = c.data.split("_")[1]
+    compare_list.append(drone_name)
+
+    answer_text = COMPARE[chat_lang.get(c.message.chat.id, 'ru')].format(number = "2")
+
+    await c.message.edit_text(answer_text, reply_markup = await kb_compare.drones2())
+
+@router.callback_query(F.data.startswith("compare2_"))
+async def compare_drones(c: CallbackQuery):
+    from new_voice_handler import chat_lang
+
+    global compare_list
+    drone_name = c.data.split("_")[1]
+    compare_list.append(drone_name)
+
+    drone1_info = str(WorkWithDB.show_characteristics(compare_list[0]))
+    drone2_info = str(WorkWithDB.show_characteristics(compare_list[1]))
+
+    prompt = f"""Сравните два VTOL‑дрона по ключевым параметрам:
+Модель A: {str(compare_list[0])}, характеристики: {drone1_info}
+Модель B: {str(compare_list[1])}, характеристики: {drone2_info}
+Выделите, по каким параметрам какая модель лучше, и сделайте краткий вывод. Свой ответ дай на {chat_lang.get(c.message.chat.id, 'ru')} языке"""
+    answer = await MistralAPI.query(OPENROUTER_API_KEY, prompt)
+    await c.message.edit_text(answer)
 
 @router.callback_query(F.data == 'performance')
 @router.callback_query(F.data.startswith("presentaion_"))
