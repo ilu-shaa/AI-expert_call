@@ -23,9 +23,9 @@ async def start_kb(language: str):
     return keyboard.adjust(1).as_markup()
 
 back_to_start = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🔙 Назад", callback_data="backStart")]
+    [InlineKeyboardButton(text="🔙", callback_data="backStart")]
 ])
 
 back_to_start_delete = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🔙 Назад", callback_data="backStartDelete")]
+    [InlineKeyboardButton(text="🔙", callback_data="backStartDelete")]
 ])

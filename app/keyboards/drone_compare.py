@@ -7,7 +7,7 @@ async def inline_words_phrases():
     db = WorkWithDB.load_all()
     for drone in db.keys():
         keyboard.add(InlineKeyboardButton(text = drone, callback_data = f"compare1_{drone}"))
-    keyboard.add(InlineKeyboardButton(text = "🔙 Назад", callback_data = "backStartDelete"))
+    keyboard.add(InlineKeyboardButton(text = "🔙", callback_data = "backStartDelete"))
     return keyboard.adjust(2).as_markup()
 
 async def drones2():
@@ -15,5 +15,5 @@ async def drones2():
     db = WorkWithDB.load_all()
     for drone in db.keys():
         keyboard.add(InlineKeyboardButton(text = drone, callback_data = f"compare2_{drone}"))
-    keyboard.add(InlineKeyboardButton(text = "🔙 Назад", callback_data = "backStartDelete"))
+    keyboard.add(InlineKeyboardButton(text = "🔙", callback_data = "backStartDelete"))
     return keyboard.adjust(2).as_markup()

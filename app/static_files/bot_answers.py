@@ -25,3 +25,7 @@ FEATURES = {"ru" : [["Скорость:", "км/ч"], ["Время полёта:
 COMPARE = {"ru" : "Выберите {number} дрон для сравнения",
             "en" : "Select {number} drone to compare",
             "cn" : "選擇 {number} 架無人機進行比較"}
+
+ASK_QUESTION = {"ru" : "Задайте свой вопрос текстом или голосом.",
+               "en" : "Ask your question in text or voice.",
+               "cn" : "透過文字或語音提出您的問題。"}

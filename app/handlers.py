@@ -14,7 +14,7 @@ from config import OPENROUTER_API_KEY
 from keyboards.start_keyboard import lang_menu, back_to_start, back_to_start_delete, start_kb
 import keyboards.drone_presentation as kb
 import keyboards.drone_compare as kb_compare
-from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES, CERTIFICATE, FEATURES, COMPARE
+from static_files.bot_answers import GREETINGS, PRESENTAION_VTOL_DRONES, CERTIFICATE, FEATURES, COMPARE, ASK_QUESTION
 
 from workTools.WorkWithDB import WorkWithDB
 from workTools.WorkWithTTS import WorkWithTTS
@@ -96,7 +96,7 @@ async def compare_drones(c: CallbackQuery, bot: Bot):
     prompt = f"""Сравните два VTOL‑дрона по ключевым параметрам:
 Модель A: {str(compare_list[0])}, характеристики: {drone1_info}
 Модель B: {str(compare_list[1])}, характеристики: {drone2_info}
-Выделите, по каким параметрам какая модель лучше, и сделайте краткий вывод (меньше 900 символов). Свой ответ дай на {chat_lang.get(c.message.chat.id, 'ru')} языке"""
+Выделите, по каким параметрам какая модель лучше, и сделайте ОЧЕНЬ краткий вывод. Свой ответ дай на {chat_lang.get(c.message.chat.id, 'ru')} языке"""
     answer = await MistralAPI.query(OPENROUTER_API_KEY, prompt)
 
     audio_bytes = await WorkWithTTS.text_to_speech(task = "compare", text = answer, lang = chat_lang.get(c.message.chat.id, 'ru'))
@@ -174,8 +174,10 @@ async def show_cert(c: CallbackQuery):
 # Переход в режим Q&A
 @router.callback_query(F.data=='question')
 async def enter_qa(c: CallbackQuery, state: FSMContext):
-    await state.set_state(Flag.awaiting_question) 
-    await c.message.answer('Задайте свой вопрос текстом или голосом.') # reply_markup=back_to_start
+    from new_voice_handler import chat_lang
+    await state.set_state(Flag.awaiting_question)
+    answer = ASK_QUESTION[chat_lang.get(c.message.chat.id, 'ru')]
+    await c.message.answer(answer) # reply_markup=back_to_start
 
 def get_whisper_model():
     global _whisper_model
@@ -252,7 +254,7 @@ async def handle_question(m: Message, state: FSMContext, bot: Bot):
         for name, info in db.items()
     )
     # Запрос к MistralAPI
-    prompt = f"Context: {context}\nQuestion: {user_question}"
+    prompt = f"Context: {context}\nQuestion: {user_question}. Свой ответ дай на {chat_lang.get(m.chat.id, 'ru')} языке"
     answer = await MistralAPI.query(prompt = prompt, token = OPENROUTER_API_KEY)
 
     audio_bytes = await WorkWithTTS.text_to_speech(task = "answer-question", text = answer, lang = chat_lang.get(m.chat.id, 'ru'))
