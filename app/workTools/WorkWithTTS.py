@@ -1,7 +1,7 @@
 from gtts import gTTS
 from io import BytesIO
 import asyncio
-from app.workTools.WorkWithCache import WorkWithCache
+from workTools.WorkWithCache import WorkWithCache
 class WorkWithTTS:
     @staticmethod
     async def text_to_speech(task : str, text: str, lang: str = 'ru') -> BytesIO:

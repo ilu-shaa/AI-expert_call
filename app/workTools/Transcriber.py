@@ -3,7 +3,7 @@ import wave
 import json
 from vosk import Model, KaldiRecognizer
 from pydub import AudioSegment
-from app.config import VOSK_MODELS
+from config import VOSK_MODELS
 
 class Transcriber:
     models = {}
