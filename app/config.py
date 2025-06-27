@@ -1,5 +1,5 @@
 import os
-TG_TOKEN = "6656018754:AAEiySDxp4qF-DxZqG-d-Mk2od0k4ljGGBY"
+TG_TOKEN = "7975418794:AAGHW16adTdJ-uyU6HPg6Y1sgCn_IJAW94E"
 BASE_DIR = os.path.dirname(__file__)
 DB_PATH = os.path.join(BASE_DIR, 'static_files', 'db.json')
 VOSK_MODELS = {
