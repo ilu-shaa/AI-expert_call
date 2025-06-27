@@ -1,7 +1,6 @@
 import json
 import os
 import base64
-
 class WorkWithCache:
     path = os.getcwd().replace("\\", "/") + "/app/static_files/tts_cache.json"
     @staticmethod

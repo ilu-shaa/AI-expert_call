@@ -23,6 +23,7 @@ from app.workTools.WorkWithLLM import MistralAPI
 from app.workTools.WorkWithCache import WorkWithCache
 from app.workTools.search_db import search_db
 
+
 class Flag(StatesGroup):
     awaiting_question = State()
     awaiting_tts_text = State()
@@ -158,9 +159,11 @@ async def handle_question(m: Message, state: FSMContext):
     await m.answer(answer)
     audio = await WorkWithTTS.text_to_speech(task="answer-question", text=answer, lang=lang)
     await m.answer_audio(BufferedInputFile(audio, filename="answer.mp3"))
+
 # -------------------
-# компаратор 
+# Компаратор
 # -------------------
+
 @router.callback_query(F.data == 'compare')
 async def ask_compare(c: CallbackQuery, state: FSMContext):
     await state.set_state(Flag.awaiting_compare_selection)
@@ -192,7 +195,6 @@ async def toggle_model(c: CallbackQuery, state: FSMContext):
     await state.update_data(compare_list=list(chosen))
     await send_compare_keyboard(c, state)
 
-
 @router.callback_query(F.data == 'run_compare')
 async def run_compare(c: CallbackQuery, state: FSMContext):
     data = await state.get_data()
@@ -208,7 +210,10 @@ async def run_compare(c: CallbackQuery, state: FSMContext):
         'en': 'You are an expert. Answer very concisely in English without tags.',
         'cn': '您是專家，請非常簡短地回答，不要使用標籤。'
     }[lang]
-    user_msg = f"Сравните эти дроны по ключевым параметрам: {content}"
+    user_msg = {
+    'ru': f"Сравните эти дроны по ключевым параметрам на русском: {content}",
+    'en': f"Compare these drones by key parameters in English: {content}",
+    'cn': f"请用中文比较以下无人机的关键参数: {content}"}[lang]
     try:
         resp = ollama.chat(
             model='qwen3:8b',

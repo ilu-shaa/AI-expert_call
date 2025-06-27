@@ -1,4 +1,3 @@
-# app/new_voice_handler.py
 import os
 import tempfile
 from aiogram import Router

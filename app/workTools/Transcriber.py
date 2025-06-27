@@ -7,7 +7,6 @@ from app.config import VOSK_MODELS
 
 class Transcriber:
     models = {}
-
     @staticmethod
     def load_model(lang_code: str):
         path = VOSK_MODELS.get(lang_code)
@@ -16,7 +15,6 @@ class Transcriber:
         if lang_code not in Transcriber.models:
             Transcriber.models[lang_code] = Model(path)
         return Transcriber.models[lang_code]
-
     @staticmethod
     def transcribe(ogg_path: str, lang_code: str) -> str:
         model = Transcriber.load_model(lang_code)
