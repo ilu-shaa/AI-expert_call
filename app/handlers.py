@@ -231,3 +231,4 @@ async def run_compare(c: CallbackQuery, state: FSMContext):
     audio = await WorkWithTTS.text_to_speech(task='compare', text=report, lang=lang)
     await c.message.answer_audio(BufferedInputFile(audio, filename='compare.mp3'))
     await state.clear()
+
