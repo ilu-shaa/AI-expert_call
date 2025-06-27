@@ -15,7 +15,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 from app.config import OPENROUTER_API_KEY
 from app.keyboards.start_keyboard import lang_menu, start_kb, back_to_start
-from app.static_files.bot_answers import GREETINGS, CERTIFICATE
+from app.static_files.bot_answers import GREETINGS
 from app.new_voice_handler import chat_lang, WHISPER_LANG
 from app.workTools.WorkWithDB import WorkWithDB
 from app.workTools.WorkWithTTS import WorkWithTTS
@@ -90,15 +90,16 @@ async def features_list(c: CallbackQuery):
 @router.callback_query(F.data.startswith('feat:'))
 async def show_features(c: CallbackQuery):
     name = c.data.split(':', 1)[1]
+    lang = chat_lang.get(c.message.chat.id, 'ru')
     specs = WorkWithDB.show_characteristics(name)
-    lines = [f"📌 {name}"]
-    for section in ('performance', 'weights', 'dimensions'):
-        data = specs.get(section, {})
-        if data:
-            lines.append(f"\n{section.title()}:")
-            for k, v in data.items():
-                lines.append(f'• {k}: {v}')
-    await c.message.answer("\n".join(lines))
+    context = json.dumps(specs, ensure_ascii=False, indent=2)
+    prompt = {
+        'ru': f"Ты — эксперт по дронам. Сократите до 2 предложений описание VTOL-дронов {name} на русском языке: {context}",
+        'en': f"You are a drone expert. Reduce the description of VTOL drones to 2 sentences {name} in English: {context}",
+        'cn': f"您是无人机专家。將垂直起降無人機的描述縮減為 2 句話 {name} 的特性: {context}"
+    }[lang]
+    result = await MistralAPI.query(prompt=prompt, system=prompt, max_tokens=500)
+    await c.message.answer(result)
 
 # -------------------
 # Вход в Q&A
@@ -153,7 +154,7 @@ async def handle_question(m: Message, state: FSMContext):
 
     prompt = f"{system_prompt}\n\nКонтекст:\n{context}\n\nВопрос: {user_question}"
 
-    answer = await MistralAPI.query(prompt=prompt, system=system_prompt, max_tokens=2000)
+    answer = await MistralAPI.query(prompt=prompt, system=system_prompt, max_tokens=1000)
     answer = answer.strip()
     if len(answer) > 1000:
         answer = answer[:997] + "..."
@@ -209,26 +210,20 @@ async def run_compare(c: CallbackQuery, state: FSMContext):
     content = ' ; '.join(pairs)
     lang = chat_lang.get(c.message.chat.id, 'ru')
     system_msg = {
-        'ru': 'Вы — эксперт. Ответьте очень кратко на русском без тегов.',
-        'en': 'You are an expert. Answer very concisely in English without tags.',
-        'cn': '您是專家，請非常簡短地回答，不要使用標籤。'
+        'ru': 'Ты — эксперт по БАС. Ответь ОЧЕНЬ кратко и по сути, ТОЛЬКО ГЛАВНОЕ, КОЛИЧЕСТВО СИМВОЛОВ ОГРАНИЧЕНО, 5 ПРЕДЛОДЕНИЙ, строго на русском языке.',
+        'en': 'You are a drone expert. Answer VERY briefly and to the point, ONLY THE MAIN, NUMBER OF CHARACTERS IS LIMITED, 5 SENTENCES in English.',
+        'cn': '您是無人機專家。請非常簡短地回答問題，字數限制在5句以內。'
     }[lang]
     user_msg = {
-    'ru': f"Сравните эти дроны по ключевым параметрам на русском: {content}",
-    'en': f"Compare these drones by key parameters in English: {content}",
-    'cn': f"请用中文比较以下无人机的关键参数: {content}"}[lang]
+        'ru': f"Сравни модели по ключевым характеристикам: {content}",
+        'en': f"Compare the drones based on key specifications: {content}",
+        'cn': f"请比较以下无人机的主要参数: {content}"
+    }[lang]
+
     try:
-        resp = ollama.chat(
-            model='qwen3:8b',
-            messages=[
-                {'role': 'system', 'content': system_msg},
-                {'role': 'user', 'content': user_msg}
-            ]
-        )
-        report = resp['message']['content']
+        report = await MistralAPI.query(prompt=user_msg, system=system_msg, max_tokens=1000)
     except Exception as e:
         report = f"❌ Ошибка при сравнении: {e}"
-    # Удаляем любые теги
     report = re.sub(r'<[^>]+>', '', report).strip()
     await c.message.answer(report, parse_mode=None)
     audio = await WorkWithTTS.text_to_speech(task='compare', text=report, lang=lang)
