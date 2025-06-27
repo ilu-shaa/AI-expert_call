@@ -80,29 +80,25 @@ async def show_intro(c: CallbackQuery):
 # -------------------
 @router.callback_query(F.data == 'features')
 async def features_list(c: CallbackQuery):
+    lang = chat_lang.get(c.message.chat.id, 'ru')
+    prompt = {'ru': 'Выберите модель...', 'en': 'Select a model...', 'cn': '请选择型号...'}[lang]
     names = list(WorkWithDB.load_all().keys())
-    buttons = [InlineKeyboardButton(text=n, callback_data=f"feat:{n}") for n in names]
+    buttons = [InlineKeyboardButton(text=n, callback_data=f'feat:{n}') for n in names]
     kb = InlineKeyboardMarkup(inline_keyboard=[buttons[i:i+2] for i in range(0, len(buttons), 2)])
-    await c.message.answer("Выберите модель для просмотра характеристик:", reply_markup=kb)
+    await c.message.answer(prompt, reply_markup=kb)
 
 @router.callback_query(F.data.startswith('feat:'))
 async def show_features(c: CallbackQuery):
-    name = c.data.split(':',1)[1]
+    name = c.data.split(':', 1)[1]
     specs = WorkWithDB.show_characteristics(name)
-    lines = [f"📌 <b>{name}</b>"]
-    for section in ("performance", "weights", "dimensions"):
+    lines = [f"📌 {name}"]
+    for section in ('performance', 'weights', 'dimensions'):
         data = specs.get(section, {})
         if data:
-            lines.append(f"\n<b>{section.title()}:</b>")
-            for k,v in data.items():
-                lines.append(f"• {k}: {v}")
-    docs = specs.get("compliance_documents", [])
-    if docs:
-        lines.append("\n<b>Документы соответствия:</b>")
-        for d in docs:
-            lines.append(f"• {d}")
-
-    await c.message.answer("\n".join(lines), parse_mode="HTML")
+            lines.append(f"\n{section.title()}:")
+            for k, v in data.items():
+                lines.append(f'• {k}: {v}')
+    await c.message.answer("\n".join(lines))
 
 # -------------------
 # Вход в Q&A
@@ -169,35 +165,34 @@ async def handle_question(m: Message, state: FSMContext):
 @router.callback_query(F.data == 'compare')
 async def ask_compare(c: CallbackQuery, state: FSMContext):
     await state.set_state(Flag.awaiting_compare_selection)
-    await state.update_data(compare_list=[])
+    lang = chat_lang.get(c.message.chat.id, 'ru')
+    await state.update_data(compare_list=[], lang=lang)
     await send_compare_keyboard(c, state)
 
 async def send_compare_keyboard(c: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     chosen = set(data.get('compare_list', []))
+    lang = data.get('lang', 'ru')
+    labels = {'ru': 'Сравнить', 'en': 'Compare', 'cn': '比较'}
+    prompt = {'ru': 'Выберите модели:', 'en': 'Select drones:', 'cn': '选择无人机:'}[lang]
     names = list(WorkWithDB.load_all().keys())
-    buttons = []
-    for n in names:
-        mark = '✅' if n in chosen else '▫️'
-        buttons.append(InlineKeyboardButton(text=f"{mark} {n}", callback_data=f"toggle:{n}"))
-    buttons.append(InlineKeyboardButton(text="🔀 Сравнить", callback_data="run_compare"))
+    buttons = [InlineKeyboardButton(text=('✅ ' if n in chosen else '▫️ ')+n, callback_data=f"toggle:{n}") for n in names]
+    buttons.append(InlineKeyboardButton(text=f"🔀 {labels[lang]}", callback_data='run_compare'))
     kb = InlineKeyboardMarkup(inline_keyboard=[buttons[i:i+2] for i in range(0, len(buttons), 2)])
     try:
-        await c.message.edit_text('Выберите модели для сравнения:', reply_markup=kb)
+        await c.message.edit_text(prompt, reply_markup=kb)
     except:
-        await c.message.answer('Выберите модели для сравнения:', reply_markup=kb)
+        await c.message.answer(prompt, reply_markup=kb)
 
 @router.callback_query(F.data.startswith('toggle:'))
 async def toggle_model(c: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    chosen = set(data.get('compare_list', []))
-    m = c.data.split(':', 1)[1]
-    if m in chosen:
-        chosen.remove(m)
-    else:
-        chosen.add(m)
+    chosen = set(data['compare_list'])
+    model = c.data.split(':',1)[1]
+    chosen.symmetric_difference_update({model})
     await state.update_data(compare_list=list(chosen))
     await send_compare_keyboard(c, state)
+
 
 @router.callback_query(F.data == 'run_compare')
 async def run_compare(c: CallbackQuery, state: FSMContext):
