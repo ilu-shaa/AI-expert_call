@@ -141,8 +141,10 @@ async def handle_question(m: Message, state: FSMContext):
     else:
         user_question = m.text or ""
 
-    relevant = search_db(user_question, top_k=2)
-    context = "\n\n".join([f"{name}:\n{info}" for name, info in relevant])
+    # Загружаем всю базу без ограничений
+    full_db = WorkWithDB.load_all()
+    context = "\n\n".join([f"{name}:\n{info}" for name, info in full_db.items()])
+
     system_prompt = {
         'ru': "Ты — эксперт по VTOL-дронам. Используй только приведённую информацию для ответа.",
         'en': "You are a VTOL drone expert. Use only the provided context to answer.",
@@ -151,7 +153,7 @@ async def handle_question(m: Message, state: FSMContext):
 
     prompt = f"{system_prompt}\n\nКонтекст:\n{context}\n\nВопрос: {user_question}"
 
-    answer = await MistralAPI.query(prompt=prompt, system=system_prompt, max_tokens=200)
+    answer = await MistralAPI.query(prompt=prompt, system=system_prompt, max_tokens=2000)
     answer = answer.strip()
     if len(answer) > 1000:
         answer = answer[:997] + "..."
@@ -159,6 +161,7 @@ async def handle_question(m: Message, state: FSMContext):
     await m.answer(answer)
     audio = await WorkWithTTS.text_to_speech(task="answer-question", text=answer, lang=lang)
     await m.answer_audio(BufferedInputFile(audio, filename="answer.mp3"))
+
 
 # -------------------
 # Компаратор
@@ -231,4 +234,3 @@ async def run_compare(c: CallbackQuery, state: FSMContext):
     audio = await WorkWithTTS.text_to_speech(task='compare', text=report, lang=lang)
     await c.message.answer_audio(BufferedInputFile(audio, filename='compare.mp3'))
     await state.clear()
-
