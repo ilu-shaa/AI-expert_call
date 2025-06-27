@@ -1,181 +1,844 @@
-{"JOUAV CW-15" : {
-  "manufacturer": "JOUAV",
-  "country": "China",
-  "category": "Fixed-wing VTOL",
-  "role": "Industrial inspection, mapping, surveillance",
-  "release_year": 2020,
-  "dimensions": {
-    "length_mm": 2060,
-    "wingspan_mm": 3540,
-    "height_mm": 500
-  },
-  "weights": {
-    "empty_weight_kg": 6.5,
-    "max_takeoff_weight_kg": 15,
-    "max_payload_kg": 3
-  },
-  "performance": {
-    "max_speed_kmh": 61,
-    "cruise_speed_kmh": 61,
-    "flight_time_min": 180,
-    "max_range_km": 50,
-    "service_ceiling_m": 6500,
-    "rate_of_climb_mps": null
-  },
-  "power_system": {
-    "power_type": "Electric",
-    "battery_type": "Li-ion"
-  },
-  "motors": {
-    "motor_count": 4,
-    "propeller_diameter_in": 12
-  },
-  "comms": {
-    "control_link": "4G/LTE + RF",
-    "telemetry_link": "Real-time HD video",
-    "ads_b": "Yes"
-  },
-  "autonomy": {
-    "autopilot": "Yes (DJI compatible)",
-    "GNSS": "GPS/GLONASS/BeiDou",
-    "obstacle_avoidance": "ADS-B only"
-  },
-  "payloads_supported": {
-    "camera_types": "RGB, multispectral, thermal",
-    "LiDAR": "Yes (JoLiDAR-1000)", 
-    "other_sensors": "Gas detectors, radiation sensors",
-    "payload_modularity": "Hot-swappable"
-  },
-  "environment": {
-    "operating_temp_min_c": -20,
-    "operating_temp_max_c": 50,
-    "max_wind_resistance_mps": 12,
-    "rain_resistance": "Light rain protection" 
-  },
-  "launch_method": "Autonomous VTOL",
-  "landing_method": "Autonomous landing",
-  "certification_status": "ISO9001", 
-  "compliance_documents": [
-    "ISO9001:2015 Quality Certificate"
-  ],
-  "unit_price_usd": 25000,
-  "logistics_requirements": "Transport case (1600×800×600 mm), 2-person assembly",
-  "use_cases": [
-    "Precision agriculture", 
-    "Power line inspection"
-  ],
-  "case_studies": [
-    {
-      "name": "Shandong Wheat Crop Monitoring", 
-      "result": "Hyper-spectral imaging with X20P camera"
-    }
-  ],
-  "sources": [
-    {"url": "https://www.jouav.com/products/cw-15.html", "description": "Official specifications"},
-    {"url": "https://www.jouav.com/download/JOUAV_CW-15_Datasheet_EN.pdf", "description": "Official datasheet (2023)"},
-    {"url": "https://doi.org/10.1016/j.drone.2021.100003", "description": "Agricultural use case study"}
-  ]
-},
-"EH216-S" : {
-  "manufacturer": "EHang",
-  "country": "China",
-  "category": "Multicopter eVTOL",
-  "role": "Urban air mobility (passenger transport)",
-  "first_flight_year": 2016,
-  "certification_year": 2023,
-  "commercial_service_start": 2024,
-  "dimensions": {
-    "length_mm": 5600,
-    "wingspan_mm": 5600,
-    "height_mm": 1900
-  },
-  "weights": {
-    "empty_weight_kg": 360,
-    "max_takeoff_weight_kg": 650,
-    "max_payload_kg": 220
-  },
-  "performance": {
-    "max_speed_kmh": 130,
-    "cruise_speed_kmh": 100,
-    "flight_time_min": 25,
-    "max_range_km": 35,
-    "service_ceiling_m": 3000,
-    "rate_of_climb_mps": 6
-  },
-  "power_system": {
-    "power_type": "Electric",
-    "battery_type": "High-energy-density LiPo",
-    "battery_capacity_wh": "~152000 (Estimated, not officially confirmed)",
-    "fuel_capacity_l": null 
-  },
-  "motors": {
-    "motor_count": 16,
-    "motor_power_w": 5000,
-    "propeller_diameter_in": 24
-  },
-  "comms": {
-    "control_link": "5G + redundant RF",
-    "data_link_range_km": 30,
-    "telemetry_link": "Real-time cabin monitoring",
-    "ads_b": "Yes (ADS-B In/Out)"
-  },
-  "autonomy": {
-    "autopilot": "Full autonomous flight",
-    "GNSS": "GPS/BeiDou with RTK",
-    "obstacle_avoidance": "LiDAR + computer vision"
-  },
-  "payloads_supported": {
-    "camera_types": "360° safety cameras",
-    "LiDAR": "Integrated for navigation (Not user payload)",
-    "other_sensors": "Emergency parachute system",
-    "payload_modularity": "Fixed passenger cabin (2 seats)"
-  },
-  "environment": {
-    "operating_temp_min_c": -10,
-    "operating_temp_max_c": 40,
-    "max_wind_resistance_mps": 8,
-    "rain_resistance": "IP55"
-  },
-  "launch_method": "Vertical takeoff (VTOL)",
-  "landing_method": "Autonomous landing pad",
-  "certification_status": {
-    "CAAC": "Type Certified (October 2023)",
-    "EASA": "Validation in progress (SC-VTOL-01)"
-  },
-  "compliance_documents": [
-    "CAAC Type Certificate No. TC0069A-EL",
-    "EASA SC-VTOL-01 (Basis for validation)"
-  ],
-  "unit_price_usd": "~330,000 (Estimated)",
-  "logistics_requirements": "Requires vertipad infrastructure",
-  "use_cases": [
-    "Urban air taxi services",
-    "Emergency medical transport"
-  ],
-  "case_studies": [
-    {
-      "name": "Guangzhou AAM Pilot Program",
-      "result": "Conducted 2000+ autonomous demonstration flights"
-    }
-  ],
-  "notes": [ 
-    "Flight time/range estimates are for optimal conditions",
-    "Battery capacity value is based on third-party estimates",
-    "EASA validation expected by 2025"
-  ],
-  "sources": [
-    {
-       "url": "https://www.ehang.com/ehang216/",
-       "description": "Manufacturer specifications"
+{
+  "JOUAV CW-15": {
+    "manufacturer": "JOUAV",
+    "country": "China",
+    "category": "Fixed-wing VTOL",
+    "role": "Industrial inspection, mapping, surveillance",
+    "release_year": 2020,
+    "dimensions": {
+      "length_mm": 2060,
+      "wingspan_mm": 3540,
+      "height_mm": 500
     },
-    {
-      "url": "https://www.ehang.com/news/695.html",
-      "description": "CAAC Certification Announcement (Oct 2023)"
+    "weights": {
+      "empty_weight_kg": 6.5,
+      "max_takeoff_weight_kg": 15,
+      "max_payload_kg": 3
     },
-    {
-      "url": "https://www.easa.europa.eu/en/document-library/special-conditions/sc-vtol-01-ehang-intelligent-energy-ehang-216-s",
-      "description": "EASA SC-VTOL-01"
-    }
-  ]
-}
+    "performance": {
+      "max_speed_kmh": 61,
+      "cruise_speed_kmh": 61,
+      "flight_time_min": 180,
+      "max_range_km": 50,
+      "service_ceiling_m": 6500,
+      "rate_of_climb_mps": null
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "Li-ion",
+      "battery_capacity_wh": null,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 4,
+      "motor_power_w": null,
+      "propeller_diameter_in": 12
+    },
+    "comms": {
+      "control_link": "4G/LTE + RF",
+      "data_link_range_km": null,
+      "telemetry_link": "Real-time HD video",
+      "ads_b": "Yes"
+    },
+    "autonomy": {
+      "autopilot": "Yes (DJI compatible)",
+      "GNSS": "GPS/GLONASS/BeiDou",
+      "obstacle_avoidance": "ADS-B only"
+    },
+    "payloads_supported": {
+      "camera_types": ["RGB", "multispectral", "thermal"],
+      "LiDAR": "JoLiDAR-1000",
+      "other_sensors": ["Gas detectors", "radiation sensors"],
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": -20,
+      "operating_temp_max_c": 50,
+      "max_wind_resistance_mps": 12,
+      "rain_resistance": "Light rain protection"
+    },
+    "launch_method": "Autonomous VTOL",
+    "landing_method": "Autonomous landing",
+    "certification_status": "ISO9001",
+    "compliance_documents": [
+      "ISO9001:2015 Quality Certificate"
+    ],
+    "unit_price_usd": 25000,
+    "logistics_requirements": "Transport case (1600×800×600 mm), 2-person assembly",
+    "use_cases": [
+      "Precision agriculture",
+      "Power line inspection"
+    ],
+    "case_studies": [
+      {
+        "name": "Shandong Wheat Crop Monitoring",
+        "result": "Hyper-spectral imaging with X20P camera"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.jouav.com/products/cw-15.html",
+        "description": "Official specifications"
+      },
+      {
+        "url": "https://www.jouav.com/download/JOUAV_CW-15_Datasheet_EN.pdf",
+        "description": "Official datasheet (2023)"
+      },
+      {
+        "url": "https://doi.org/10.1016/j.drone.2021.100003",
+        "description": "Agricultural use case study"
+      }
+    ]
+  },
+  "EH216-S": {
+    "manufacturer": "EHang",
+    "country": "China",
+    "category": "Multicopter eVTOL",
+    "role": "Urban air mobility (passenger transport)",
+    "first_flight_year": 2016,
+    "certification_year": 2023,
+    "commercial_service_start": 2024,
+    "dimensions": {
+      "length_mm": 5600,
+      "wingspan_mm": 5600,
+      "height_mm": 1900
+    },
+    "weights": {
+      "empty_weight_kg": 360,
+      "max_takeoff_weight_kg": 650,
+      "max_payload_kg": 220
+    },
+    "performance": {
+      "max_speed_kmh": 130,
+      "cruise_speed_kmh": 100,
+      "flight_time_min": 25,
+      "max_range_km": 35,
+      "service_ceiling_m": 3000,
+      "rate_of_climb_mps": 6
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "High-energy-density LiPo",
+      "battery_capacity_wh": "~152000 (Estimated)",
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 16,
+      "motor_power_w": 5000,
+      "propeller_diameter_in": 24
+    },
+    "comms": {
+      "control_link": "5G + redundant RF",
+      "data_link_range_km": 30,
+      "telemetry_link": "Real-time cabin monitoring",
+      "ads_b": "Yes (ADS-B In/Out)"
+    },
+    "autonomy": {
+      "autopilot": "Full autonomous flight",
+      "GNSS": "GPS/BeiDou with RTK",
+      "obstacle_avoidance": "LiDAR + computer vision"
+    },
+    "payloads_supported": {
+      "camera_types": ["360° safety cameras"],
+      "LiDAR": null,
+      "other_sensors": ["Emergency parachute system"],
+      "payload_modularity": false
+    },
+    "environment": {
+      "operating_temp_min_c": -10,
+      "operating_temp_max_c": 40,
+      "max_wind_resistance_mps": 8,
+      "rain_resistance": "IP55"
+    },
+    "launch_method": "Vertical takeoff (VTOL)",
+    "landing_method": "Autonomous landing pad",
+    "certification_status": {
+      "CAAC": "Type Certified (October 2023)",
+      "EASA": "Validation in progress (SC-VTOL-01)"
+    },
+    "compliance_documents": [
+      "CAAC Type Certificate No. TC0069A-EL",
+      "EASA SC-VTOL-01"
+    ],
+    "unit_price_usd": "~330,000 (Estimated)",
+    "logistics_requirements": "Requires vertipad infrastructure",
+    "use_cases": [
+      "Urban air taxi services",
+      "Emergency medical transport"
+    ],
+    "case_studies": [
+      {
+        "name": "Guangzhou AAM Pilot Program",
+        "result": "2000+ demonstration flights"
+      }
+    ],
+    "notes": [
+      "Estimates for optimal conditions",
+      "Battery capacity unconfirmed",
+      "EASA validation expected by 2025"
+    ],
+    "sources": [
+      {
+        "url": "https://www.ehang.com/ehang216/",
+        "description": "Manufacturer specifications"
+      },
+      {
+        "url": "https://www.ehang.com/news/695.html",
+        "description": "CAAC Certification Announcement"
+      },
+      {
+        "url": "https://www.easa.europa.eu/en/document-library/special-conditions/sc-vtol-01-ehang-intelligent-energy-ehang-216-s",
+        "description": "EASA SC-VTOL-01"
+      }
+    ]
+  },
+  "CW-25": {
+    "manufacturer": "JOUAV",
+    "country": "China",
+    "category": "Hybrid VTOL Fixed-wing",
+    "role": "Aerial surveying, infrastructure inspection, surveillance, search and rescue",
+    "release_year": null,
+    "dimensions": {
+      "length_mm": 2180,
+      "wingspan_mm": 4070,
+      "height_mm": null
+    },
+    "weights": {
+      "empty_weight_kg": null,
+      "max_takeoff_weight_kg": 29.5,
+      "max_payload_kg": 6
+    },
+    "performance": {
+      "max_speed_kmh": 120,
+      "cruise_speed_kmh": 82.8,
+      "flight_time_min": 360,
+      "max_range_km": 200,
+      "service_ceiling_m": 7000,
+      "rate_of_climb_mps": null
+    },
+    "power_system": {
+      "power_type": "Hybrid",
+      "battery_type": null,
+      "battery_capacity_wh": null,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 5,
+      "motor_power_w": null,
+      "propeller_diameter_in": null
+    },
+    "comms": {
+      "control_link": "TC-200 / GCS-303",
+      "data_link_range_km": 100,
+      "telemetry_link": "Supported",
+      "ads_b": null
+    },
+    "autonomy": {
+      "autopilot": "MEMS+GPS",
+      "GNSS": "Dual GPS RTK/PPK",
+      "obstacle_avoidance": null
+    },
+    "payloads_supported": {
+      "camera_types": ["CA-103 (61MP)", "MG-120E (EO/IR)", "MG-150E (EO/IR/LR)"],
+      "LiDAR": "JoLiDAR-LR22",
+      "other_sensors": ["MiniSAR", "Aeromagnetic sensors", "Thermal imagers"],
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": -30,
+      "operating_temp_max_c": 50,
+      "max_wind_resistance_mps": 17.1,
+      "rain_resistance": "Light rain"
+    },
+    "launch_method": "VTOL",
+    "landing_method": "Autonomous landing",
+    "certification_status": null,
+    "compliance_documents": [],
+    "unit_price_usd": null,
+    "logistics_requirements": "Disassembles into 11 parts (1550×690×690mm)",
+    "use_cases": [
+      "Large-scale topographic mapping",
+      "Power line inspection",
+      "Mine surveying and stockpile measurement",
+      "Border surveillance",
+      "Disaster response operations"
+    ],
+    "case_studies": [
+      {
+        "name": "Baorixile Open Pit Mine Surveying",
+        "result": "6.5× efficiency increase"
+      },
+      {
+        "name": "High-altitude Operations",
+        "result": "7,000 m ceiling"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.jouav.com/products/cw-25.html",
+        "description": "Official specs"
+      },
+      {
+        "url": "https://www.jouav.com/fixed-wing-drone",
+        "description": "Use cases"
+      }
+    ]
+  },
+  "Dragonfish Standard": {
+    "manufacturer": "Autel Robotics",
+    "country": "China",
+    "category": "VTOL tiltrotor",
+    "role": "Multi-purpose UAV for reconnaissance, monitoring, and inspections (public safety, energy, agriculture)",
+    "release_year": 2023,
+    "dimensions": {
+      "length_mm": 1290,
+      "wingspan_mm": 2300,
+      "height_mm": 460
+    },
+    "weights": {
+      "empty_weight_kg": 6.0,
+      "max_takeoff_weight_kg": 9.0,
+      "max_payload_kg": 1.5
+    },
+    "performance": {
+      "max_speed_kmh": 108,
+      "cruise_speed_kmh": 61,
+      "flight_time_min": 120,
+      "max_range_km": 30,
+      "service_ceiling_m": 6000,
+      "rate_of_climb_mps": 5
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "Li-Po (2 × 13860 mAh, 22.2V)",
+      "battery_capacity_wh": 615,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 6,
+      "motor_power_w": 1200,
+      "propeller_diameter_in": 18
+    },
+    "comms": {
+      "control_link": "Autonomous ground station (9.7\" display)",
+      "data_link_range_km": 15,
+      "telemetry_link": "Digital video transmission 5.725-5.855 GHz",
+      "ads_b": "Built-in receiver"
+    },
+    "autonomy": {
+      "autopilot": "Autel Voyager (AI-tracking, autonomous missions)",
+      "GNSS": "GPS/GLONASS/BeiDou/Galileo + RTK (1 cm accuracy)",
+      "obstacle_avoidance": "Terrain avoidance system"
+    },
+    "payloads_supported": {
+      "camera_types": [
+        "DG-L20T (20x optical zoom 4K + 640x512px thermal + laser rangefinder)",
+        "DG-L50T (50x optical zoom 4K + 1280x1024px thermal)",
+        "Multispectral cameras (optional)"
+      ],
+      "LiDAR": "3rd-party sensor support (Livox, etc.)",
+      "other_sensors": ["Laser rangefinder (up to 1200 m)"],
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": -20,
+      "operating_temp_max_c": 50,
+      "max_wind_resistance_mps": 17,
+      "rain_resistance": "IP43"
+    },
+    "launch_method": "Vertical take-off",
+    "landing_method": "Vertical landing / moving platforms",
+    "certification_status": "FAA Part 107 (USA), CE (Europe), NCC (China)",
+    "compliance_documents": ["FCC compliance", "CE compliance", "SRRC compliance"],
+    "unit_price_usd": 99000,
+    "logistics_requirements": "Transport in case (5 min assembly), 1-2 operators",
+    "use_cases": [
+      "Border patrol: Thermal detection up to 5 km range",
+      "Power line inspection: Autonomous RTK-precision routes",
+      "Search and rescue: Real-time AI tracking"
+    ],
+    "case_studies": [
+      {
+        "name": "Wildfire management (California, 2024)",
+        "result": "40% faster hotspot detection in smoky conditions"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.autelrobotics.com/dragonfish-series/specs/",
+        "description": "Official specifications"
+      },
+      {
+        "url": "https://dronelife.com/2025/03/24/updates-to-the-autel-dragonfish-platform-enhanced-features-for-industrial-applications/",
+        "description": "2025 platform updates"
+      },
+      {
+        "url": "https://uavcoach.com/autel-dragonfish/",
+        "description": "Independent performance review"
+      }
+    ]
+  },
+  "Trinity F90+": {
+    "manufacturer": "Quantum Systems",
+    "country": "Germany",
+    "category": "Hybrid VTOL",
+    "role": "Surveying, mapping, inspection",
+    "release_year": 2022,
+    "dimensions": {
+      "length_mm": 1090,
+      "wingspan_mm": 2394,
+      "height_mm": 330
+    },
+    "weights": {
+      "empty_weight_kg": 3.7,
+      "max_takeoff_weight_kg": 7.0,
+      "max_payload_kg": 1.3
+    },
+    "performance": {
+      "max_speed_kmh": 90,
+      "cruise_speed_kmh": 72,
+      "flight_time_min": 90,
+      "max_range_km": 100,
+      "service_ceiling_m": 2500,
+      "rate_of_climb_mps": null
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "Li-ion",
+      "battery_capacity_wh": 5880,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 10,
+      "motor_power_w": null,
+      "propeller_diameter_in": null
+    },
+    "comms": {
+      "control_link": "Radio",
+      "data_link_range_km": 15,
+      "telemetry_link": "Yes",
+      "ads_b": "Out"
+    },
+    "autonomy": {
+      "autopilot": "Automated flight planning",
+      "GNSS": "RTK/PPK",
+      "obstacle_avoidance": "Optional"
+    },
+    "payloads_supported": {
+      "camera_types": ["RGB", "Multispectral", "Thermal"],
+      "LiDAR": "Optional",
+      "other_sensors": ["Gas detectors", "Hyperspectral"],
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": -10,
+      "operating_temp_max_c": 45,
+      "max_wind_resistance_mps": 15,
+      "rain_resistance": "IP43"
+    },
+    "launch_method": "VTOL",
+    "landing_method": "VTOL",
+    "certification_status": "CE, FCC",
+    "compliance_documents": ["EU 2019/945", "FCC Part 15"],
+    "unit_price_usd": 29000,
+    "logistics_requirements": "Transport case (830×270×390 mm), weight 19.5 kg",
+    "use_cases": ["Topographic mapping", "Crop health monitoring", "Disaster management", "Infrastructure inspection"],
+    "case_studies": [],
+    "sources": [
+      {
+        "url": "https://quantum-systems.com/trinity/",
+        "description": "Official website"
+      }
+    ]
+  },
+  "WingtraOne GEN II": {
+    "manufacturer": "Wingtra",
+    "country": "Switzerland",
+    "category": "VTOL",
+    "role": "Aerial mapping, surveying, photogrammetry",
+    "release_year": 2021,
+    "dimensions": {
+      "length_mm": 1800,
+      "wingspan_mm": 1250,
+      "height_mm": 500
+    },
+    "weights": {
+      "empty_weight_kg": 3.7,
+      "max_takeoff_weight_kg": 4.8,
+      "max_payload_kg": 0.8
+    },
+    "performance": {
+      "max_speed_kmh": 72,
+      "cruise_speed_kmh": 58,
+      "flight_time_min": 59,
+      "max_range_km": 53,
+      "service_ceiling_m": 2500,
+      "rate_of_climb_mps": 3.0
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "Li-ion",
+      "battery_capacity_wh": 198,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 2,
+      "motor_power_w": 1200,
+      "propeller_diameter_in": null
+    },
+    "comms": {
+      "control_link": "RF",
+      "data_link_range_km": 10,
+      "telemetry_link": "Yes",
+      "ads_b": null
+    },
+    "autonomy": {
+      "autopilot": "WingtraPilot",
+      "GNSS": "RTK/PPK with IMU",
+      "obstacle_avoidance": null
+    },
+    "payloads_supported": {
+      "camera_types": ["RGB61 (Sony a7R IV)", "MAP61", "PhaseOne iXM-100"],
+      "LiDAR": "Wingtra LiDAR Pod",
+      "other_sensors": ["Multispectral", "Thermal"],
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": -10,
+      "operating_temp_max_c": 40,
+      "max_wind_resistance_mps": 12,
+      "rain_resistance": "IP54"
+    },
+    "launch_method": "Automatic VTOL",
+    "landing_method": "Precision landing",
+    "certification_status": "CE, FCC, MIC, KC",
+    "compliance_documents": ["https://wingtra.com/drone-regulations/"],
+    "unit_price_usd": 19900,
+    "logistics_requirements": "Transport case (1500×800×600 mm)",
+    "use_cases": ["Topographic mapping", "Precision agriculture", "Mining volume calculations"],
+    "case_studies": [
+      {
+        "name": "Peru power line inspection",
+        "result": "Reduced inspection time by 80%"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://wingtra.com/wingtraone-gen-ii/",
+        "description": "Official page"
+      }
+    ]
+  },
+  "eBee X": {
+    "manufacturer": "senseFly",
+    "country": "Switzerland",
+    "category": "Fixed-wing UAV",
+    "role": "Aerial mapping, surveying, photogrammetry",
+    "release_year": 2018,
+    "dimensions": {
+      "length_mm": 1100,
+      "wingspan_mm": 3600,
+      "height_mm": 300
+    },
+    "weights": {
+      "empty_weight_kg": 1.4,
+      "max_takeoff_weight_kg": 2.4,
+      "max_payload_kg": 0.9
+    },
+    "performance": {
+      "max_speed_kmh": 110,
+      "cruise_speed_kmh": 90,
+      "flight_time_min": 90,
+      "max_range_km": 110,
+      "service_ceiling_m": 5000,
+      "rate_of_climb_mps": 4.5
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "Li-ion",
+      "battery_capacity_wh": 420,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 1,
+      "motor_power_w": 650,
+      "propeller_diameter_in": 12
+    },
+    "comms": {
+      "control_link": "RF 2.4 GHz",
+      "data_link_range_km": 10,
+      "telemetry_link": "Real-time",
+      "ads_b": null
+    },
+    "autonomy": {
+      "autopilot": "eMotion",
+      "GNSS": "RTK/PPK GPS",
+      "obstacle_avoidance": "Terrain Follow"
+    },
+    "payloads_supported": {
+      "camera_types": ["S.O.D.A. 3D", "Duet T"],
+      "LiDAR": "Optional",
+      "other_sensors": ["Multispectral", "Thermal"],
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": -10,
+      "operating_temp_max_c": 40,
+      "max_wind_resistance_mps": 14,
+      "rain_resistance": "IP43"
+    },
+    "launch_method": "Hand launch",
+    "landing_method": "Belly landing",
+    "certification_status": "CE, FCC, ICAO",
+    "compliance_documents": ["https://www.sensefly.com/compliance"],
+    "unit_price_usd": 25000,
+    "logistics_requirements": "Hard case transport",
+    "use_cases": ["Topographic mapping", "Agricultural monitoring"],
+    "case_studies": [
+      {
+        "name": "Togo Red Cross",
+        "result": "Flood response mapping (2019)"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.sensefly.com/drone/ebee-x/",
+        "description": "Official specs"
+      }
+    ]
+  },
+  "Disco-Pro AG": {
+    "manufacturer": "Parrot",
+    "country": "France",
+    "category": "Fixed-wing VTOL",
+    "role": "Agricultural surveying, infrastructure inspection",
+    "release_year": 2017,
+    "dimensions": {
+      "length_mm": 1150,
+      "wingspan_mm": 1150,
+      "height_mm": 260
+    },
+    "weights": {
+      "empty_weight_kg": 0.75,
+      "max_takeoff_weight_kg": 1.5,
+      "max_payload_kg": 0.25
+    },
+    "performance": {
+      "max_speed_kmh": 80,
+      "cruise_speed_kmh": 50,
+      "flight_time_min": 45,
+      "max_range_km": 30,
+      "service_ceiling_m": 1500,
+      "rate_of_climb_mps": 5
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "LiPo 3S",
+      "battery_capacity_wh": 40,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 1,
+      "motor_power_w": 900,
+      "propeller_diameter_in": 7
+    },
+    "comms": {
+      "control_link": "Wi-Fi 802.11a/b/g/n/ac",
+      "data_link_range_km": 2,
+      "telemetry_link": "Real-time HD video",
+      "ads_b": null
+    },
+    "autonomy": {
+      "autopilot": "Pixhawk-based",
+      "GNSS": "GPS/GLONASS",
+      "obstacle_avoidance": null
+    },
+    "payloads_supported": {
+      "camera_types": ["Parrot Sequoia+", "RGB cameras"],
+      "LiDAR": null,
+      "other_sensors": ["NDVI sensors", "Sun irradiance sensor"],
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": 0,
+      "operating_temp_max_c": 40,
+      "max_wind_resistance_mps": 12,
+      "rain_resistance": "None"
+    },
+    "launch_method": "Catapult",
+    "landing_method": "Parachute recovery",
+    "certification_status": "CE, FCC",
+    "compliance_documents": ["https://www.parrot.com/business/support/compliance"],
+    "unit_price_usd": 5000,
+    "logistics_requirements": "Portable case (1.2×0.8 m)",
+    "use_cases": ["Crop health monitoring", "Precision agriculture mapping"],
+    "case_studies": [
+      {
+        "name": "Vineyard monitoring",
+        "result": "20% yield increase"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.parrot.com/business-solutions/commercial-drones/disco-pro-ag",
+        "description": "Official specs"
+      }
+    ]
+  },
+  "Talon DT-300 / DT-300X": {
+    "manufacturer": "Rotron Aerospace",
+    "country": "United Kingdom",
+    "category": "Electric/Hybrid VTOL Helicopter UAV",
+    "role": "ISTAR, cargo delivery, logistics resupply, mothership",
+    "release_year": 2025,
+    "dimensions": {
+      "length_mm": 2800,
+      "wingspan_mm": null,
+      "height_mm": null
+    },
+    "weights": {
+      "empty_weight_kg": 31,
+      "max_takeoff_weight_kg": 90,
+      "max_payload_kg": 45
+    },
+    "performance": {
+      "max_speed_kmh": 120,
+      "cruise_speed_kmh": 80,
+      "flight_time_min": 300,
+      "max_range_km": 400,
+      "service_ceiling_m": 6000,
+      "rate_of_climb_mps": null
+    },
+    "power_system": {
+      "power_type": "Hybrid/electric",
+      "battery_type": null,
+      "battery_capacity_wh": null,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 2,
+      "motor_power_w": 15000,
+      "propeller_diameter_in": 42
+    },
+    "comms": {
+      "control_link": "Frequency-hopping datalinks",
+      "data_link_range_km": 30,
+      "telemetry_link": "Digital radio",
+      "ads_b": "Integrated ADS-B"
+    },
+    "autonomy": {
+      "autopilot": "Fully autonomous",
+      "GNSS": "Hardened GPS",
+      "obstacle_avoidance": null
+    },
+    "payloads_supported": {
+      "camera_types": ["NextVision Raptor EO/IR"],
+      "LiDAR": null,
+      "other_sensors": null,
+      "payload_modularity": true
+    },
+    "environment": {
+      "operating_temp_min_c": -20,
+      "operating_temp_max_c": 40,
+      "max_wind_resistance_mps": 11.1,
+      "rain_resistance": "IP67"
+    },
+    "launch_method": "Vertical takeoff",
+    "landing_method": "Vertical landing",
+    "certification_status": "Military & CAA UK",
+    "compliance_documents": [],
+    "unit_price_usd": null,
+    "logistics_requirements": "Foldable fuselage, 2-person transport",
+    "use_cases": ["ISTAR missions", "Logistics resupply", "Drone mothership"],
+    "case_studies": [
+      {
+        "name": "Military resupply",
+        "result": "High-wind conditions success"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://unmannedsystemstechnology.com/company/rotron-aerospace/talon-dt-300/",
+        "description": "Specs"
+      }
+    ]
+  },
+  "Mavic Air 2": {
+    "manufacturer": "DJI",
+    "country": "China",
+    "category": "Multirotor",
+    "role": "Aerial Photography, Mapping, Surveillance",
+    "release_year": 2020,
+    "dimensions": {
+      "length_mm": 183,
+      "wingspan_mm": 302,
+      "height_mm": 77
+    },
+    "weights": {
+      "empty_weight_kg": null,
+      "max_takeoff_weight_kg": 0.57,
+      "max_payload_kg": null
+    },
+    "performance": {
+      "max_speed_kmh": 68.4,
+      "cruise_speed_kmh": 42,
+      "flight_time_min": 34,
+      "max_range_km": 18.5,
+      "service_ceiling_m": 5000,
+      "rate_of_climb_mps": 4
+    },
+    "power_system": {
+      "power_type": "Electric",
+      "battery_type": "LiPo 3S",
+      "battery_capacity_wh": 40.42,
+      "fuel_capacity_l": null
+    },
+    "motors": {
+      "motor_count": 4,
+      "motor_power_w": 200,
+      "propeller_diameter_in": 6.7
+    },
+    "comms": {
+      "control_link": "OcuSync 2.0",
+      "data_link_range_km": 10,
+      "telemetry_link": "Real-time",
+      "ads_b": "No"
+    },
+    "autonomy": {
+      "autopilot": "APAS 3.0",
+      "GNSS": "GPS/GLONASS",
+      "obstacle_avoidance": "Forward,Backward,Downward"
+    },
+    "payloads_supported": {
+      "camera_types": ["48MP still", "4K/60fps video"],
+      "LiDAR": null,
+      "other_sensors": ["Vision sensors", "ToF"],
+      "payload_modularity": false
+    },
+    "environment": {
+      "operating_temp_min_c": 0,
+      "operating_temp_max_c": 40,
+      "max_wind_resistance_mps": 10.7,
+      "rain_resistance": "None"
+    },
+    "launch_method": "Vertical takeoff",
+    "landing_method": "Vertical landing",
+    "certification_status": "CE, FCC, SRRC",
+    "compliance_documents": [],
+    "unit_price_usd": 799,
+    "logistics_requirements": "Standard LiPo shipping",
+    "use_cases": ["Real estate photography", "Agricultural surveying", "Search and rescue"],
+    "case_studies": [
+      {
+        "name": "Cinematic footage",
+        "result": "High-res aerial for film"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.dji.com/mavic-air-2/specs",
+        "description": "Official specs"
+      }
+    ]
+  }
 }
