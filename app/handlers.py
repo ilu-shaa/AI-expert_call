@@ -23,7 +23,6 @@ from app.workTools.WorkWithLLM import MistralAPI
 from app.workTools.WorkWithCache import WorkWithCache
 from app.workTools.search_db import search_db
 
-# FSM states
 class Flag(StatesGroup):
     awaiting_question = State()
     awaiting_tts_text = State()
@@ -39,7 +38,7 @@ def get_whisper_model():
     return _whisper_model
 
 # -------------------
-# /start and language selection
+# /start
 # -------------------
 @router.message(Command('start'))
 async def cmd_start(msg: Message):
@@ -160,7 +159,7 @@ async def handle_question(m: Message, state: FSMContext):
     audio = await WorkWithTTS.text_to_speech(task="answer-question", text=answer, lang=lang)
     await m.answer_audio(BufferedInputFile(audio, filename="answer.mp3"))
 # -------------------
-# Comparator multi-select
+# компаратор 
 # -------------------
 @router.callback_query(F.data == 'compare')
 async def ask_compare(c: CallbackQuery, state: FSMContext):
