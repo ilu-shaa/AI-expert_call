@@ -1,8 +1,7 @@
-# app/handlers.py
-
 import json
 import os
 import tempfile
+import re
 import whisper
 import ollama
 from aiogram import Router, F
@@ -40,7 +39,7 @@ def get_whisper_model():
     return _whisper_model
 
 # -------------------
-# /start и выбор языка
+# /start and language selection
 # -------------------
 @router.message(Command('start'))
 async def cmd_start(msg: Message):
@@ -51,46 +50,31 @@ async def cmd_start(msg: Message):
 async def set_lang(c: CallbackQuery):
     lang = c.data.split(':', 1)[1]
     chat_lang[c.message.chat.id] = lang
-    confirm = {'ru':'✅ Русский','en':'✅ English','cn':'✅ 中文'}[lang]
+    confirm = {'ru': '✅ Русский', 'en': '✅ English', 'cn': '✅ 中文'}[lang]
     await c.message.edit_text(confirm, reply_markup=await start_kb(lang))
 
 # -------------------
 # Презентация / Комплектация
 # -------------------
 @router.callback_query(F.data == 'performance')
-@router.callback_query(F.data.startswith("presentaion_"))
+@router.callback_query(F.data.startswith('presentaion_'))
 async def show_intro(c: CallbackQuery):
     lang = chat_lang.get(c.message.chat.id, 'ru')
     key = f"{c.data}_{lang}"
     if WorkWithCache.check_key(key):
         audio_bytes, text = WorkWithCache.get_cache(key)
     else:
-        drone = None
-        if c.data == 'performance':
-            template = {
-                'ru': "Дайте краткий перевод презентации VTOL-дронов на русский.",
-                'en': "Provide a short translation of the VTOL drone presentation into English.",
-                'cn': "请将VTOL无人机的介绍简短地翻译成中文。"
-            }[lang]
-        else:
-            drone = c.data.split('_',1)[1]
-            template = {
-                'ru': f"Сократите до 2 предложений описание дрона {drone} на русском.",
-                'en': f"Summarize in 2 sentences a description of {drone} in English.",
-                'cn': f"用2句话简要描述{drone}。"
-            }[lang]
-
-        text = await MistralAPI.query(
-            prompt=template,
-            system=f"Вы — эксперт для {lang}-клиента.",
-            max_tokens=100
-        )
+        drone = c.data.split('_', 1)[1] if c.data != 'performance' else ''
+        template = {
+            'ru': f"Сократите до 2 предложений описание VTOL-дронов {drone}",
+            'en': f"Summarize in 2 sentences a description of VTOL drones {drone}",
+            'cn': f"用2句话简要描述VTOL无人机 {drone}"
+        }[lang]
+        text = await MistralAPI.query(prompt=template, system=template, max_tokens=100)
         audio_bytes = await WorkWithTTS.text_to_speech(task=key, text=text, lang=lang)
         WorkWithCache.append_cache(key, audio_bytes, text)
-
     await c.message.answer(text)
-    await c.message.answer_audio(BufferedInputFile(audio_bytes, filename="intro.mp3"))
-
+    await c.message.answer_audio(BufferedInputFile(audio_bytes, filename='intro.mp3'))
 # -------------------
 # Характеристики: список дронов и выбор модели
 # -------------------
@@ -101,9 +85,9 @@ async def features_list(c: CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[buttons[i:i+2] for i in range(0, len(buttons), 2)])
     await c.message.answer("Выберите модель для просмотра характеристик:", reply_markup=kb)
 
-@router.callback_query(F.data.startswith("feat:"))
+@router.callback_query(F.data.startswith('feat:'))
 async def show_features(c: CallbackQuery):
-    name = c.data.split(":",1)[1]
+    name = c.data.split(':',1)[1]
     specs = WorkWithDB.show_characteristics(name)
     lines = [f"📌 <b>{name}</b>"]
     for section in ("performance", "weights", "dimensions"):
@@ -118,18 +102,7 @@ async def show_features(c: CallbackQuery):
         for d in docs:
             lines.append(f"• {d}")
 
-    text = "\n".join(lines)
-    await c.message.answer(text, parse_mode="HTML")
-
-# -------------------
-# Сертификаты
-# -------------------
-@router.callback_query(F.data == 'certificate')
-async def show_cert(c: CallbackQuery):
-    lang = chat_lang.get(c.message.chat.id, 'ru')
-    cert = CERTIFICATE[lang]
-    docs = WorkWithDB.show_characteristics('JOUAV CW-15').get('compliance_documents', [])
-    await c.message.answer(f"{cert}\n" + "\n".join(docs))
+    await c.message.answer("\n".join(lines), parse_mode="HTML")
 
 # -------------------
 # Вход в Q&A
@@ -190,13 +163,11 @@ async def handle_question(m: Message, state: FSMContext):
     await m.answer(answer)
     audio = await WorkWithTTS.text_to_speech(task="answer-question", text=answer, lang=lang)
     await m.answer_audio(BufferedInputFile(audio, filename="answer.mp3"))
-
 # -------------------
-# Компаратор: мультивыбор и сравнение
+# Comparator multi-select
 # -------------------
 @router.callback_query(F.data == 'compare')
 async def ask_compare(c: CallbackQuery, state: FSMContext):
-    # Начинаем множественный выбор
     await state.set_state(Flag.awaiting_compare_selection)
     await state.update_data(compare_list=[])
     await send_compare_keyboard(c, state)
@@ -207,28 +178,24 @@ async def send_compare_keyboard(c: CallbackQuery, state: FSMContext):
     names = list(WorkWithDB.load_all().keys())
     buttons = []
     for n in names:
-        prefix = '✅ ' if n in chosen else '▫️ '
-        buttons.append(InlineKeyboardButton(
-            text=f"{prefix}{n}", callback_data=f"toggle:{n}"
-        ))
-    buttons.append(InlineKeyboardButton(
-        text="🔀 Сравнить", callback_data="run_compare"
-    ))
+        mark = '✅' if n in chosen else '▫️'
+        buttons.append(InlineKeyboardButton(text=f"{mark} {n}", callback_data=f"toggle:{n}"))
+    buttons.append(InlineKeyboardButton(text="🔀 Сравнить", callback_data="run_compare"))
     kb = InlineKeyboardMarkup(inline_keyboard=[buttons[i:i+2] for i in range(0, len(buttons), 2)])
     try:
-        await c.message.edit_text("Выберите модели для сравнения (отметьте галочкой):", reply_markup=kb)
+        await c.message.edit_text('Выберите модели для сравнения:', reply_markup=kb)
     except:
-        await c.message.answer("Выберите модели для сравнения (отметьте галочкой):", reply_markup=kb)
+        await c.message.answer('Выберите модели для сравнения:', reply_markup=kb)
 
 @router.callback_query(F.data.startswith('toggle:'))
 async def toggle_model(c: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     chosen = set(data.get('compare_list', []))
-    model = c.data.split(':',1)[1]
-    if model in chosen:
-        chosen.remove(model)
+    m = c.data.split(':', 1)[1]
+    if m in chosen:
+        chosen.remove(m)
     else:
-        chosen.add(model)
+        chosen.add(m)
     await state.update_data(compare_list=list(chosen))
     await send_compare_keyboard(c, state)
 
@@ -237,18 +204,31 @@ async def run_compare(c: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     chosen = data.get('compare_list', [])
     if len(chosen) < 2:
-        return await c.message.answer("Для сравнения выберите как минимум две модели.")
+        return await c.message.answer('Выберите минимум 2 дрона.')
     db = WorkWithDB.load_all()
-    pairs = []
-    for name in chosen:
-        specs = json.dumps(db[name], ensure_ascii=False)
-        pairs.append(f"{name}: {specs}")
-    content = "; ".join(pairs)
-    msg = [{'role':'user', 'content': f"Сравните следующие VTOL-дроны по ключевым параметрам: {content}"}]
-    resp = ollama.chat(model='deepseek-r1:8b', messages=msg)
-    report = resp['message']['content']
+    pairs = [f"{n}: {json.dumps(db[n], ensure_ascii=False)}" for n in chosen]
+    content = ' ; '.join(pairs)
     lang = chat_lang.get(c.message.chat.id, 'ru')
-    await c.message.answer(report)
+    system_msg = {
+        'ru': 'Вы — эксперт. Ответьте очень кратко на русском без тегов.',
+        'en': 'You are an expert. Answer very concisely in English without tags.',
+        'cn': '您是專家，請非常簡短地回答，不要使用標籤。'
+    }[lang]
+    user_msg = f"Сравните эти дроны по ключевым параметрам: {content}"
+    try:
+        resp = ollama.chat(
+            model='qwen3:8b',
+            messages=[
+                {'role': 'system', 'content': system_msg},
+                {'role': 'user', 'content': user_msg}
+            ]
+        )
+        report = resp['message']['content']
+    except Exception as e:
+        report = f"❌ Ошибка при сравнении: {e}"
+    # Удаляем любые теги
+    report = re.sub(r'<[^>]+>', '', report).strip()
+    await c.message.answer(report, parse_mode=None)
     audio = await WorkWithTTS.text_to_speech(task='compare', text=report, lang=lang)
     await c.message.answer_audio(BufferedInputFile(audio, filename='compare.mp3'))
     await state.clear()
