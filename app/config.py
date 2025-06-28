@@ -8,6 +8,6 @@ VOSK_MODELS = {
     'cn': os.path.join(BASE_DIR, 'static_files', 'vosk-model-cn-0.22'),
 }
 MISTRAL_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_API_KEY  = "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"
+OPENROUTER_API_KEY  = "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"
 USE_LOCAL_QWEN = True
  

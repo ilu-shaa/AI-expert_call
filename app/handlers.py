@@ -210,9 +210,9 @@ async def run_compare(c: CallbackQuery, state: FSMContext):
     content = ' ; '.join(pairs)
     lang = chat_lang.get(c.message.chat.id, 'ru')
     system_msg = {
-        'ru': 'Ты — эксперт по БАС. Ответь ОЧЕНЬ кратко и по сути, ТОЛЬКО ГЛАВНОЕ, КОЛИЧЕСТВО СИМВОЛОВ ОГРАНИЧЕНО, 5 ПРЕДЛОДЕНИЙ, строго на русском языке.',
-        'en': 'You are a drone expert. Answer VERY briefly and to the point, ONLY THE MAIN, NUMBER OF CHARACTERS IS LIMITED, 5 SENTENCES in English.',
-        'cn': '您是無人機專家。請非常簡短地回答問題，字數限制在5句以內。'
+        'ru': 'Ты — эксперт по БАС. Ответь ОЧЕНЬ кратко и по сути, ТОЛЬКО ГЛАВНОЕ, БЕЗ ТАБЛИЦ ФОРМАТ ОТЧЕТА, КОЛИЧЕСТВО СИМВОЛОВ ОГРАНИЧЕНО, 3 ПРЕДЛОЖЕНИЯ, строго на русском языке.',
+        'en': 'You are a drone expert. Answer VERY briefly and to the point, ONLY THE MAIN, NUMBER OF CHARACTERS IS LIMITED, 3 SENTENCES in English.',
+        'cn': '您是無人機專家。請用三句話簡短回答這個問題。 嚴格用中文回答'
     }[lang]
     user_msg = {
         'ru': f"Сравни модели по ключевым характеристикам: {content}",
