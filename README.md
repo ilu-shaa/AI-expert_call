@@ -83,8 +83,7 @@ To run locally without Docker:
 
 ```bash
 pip install -r requirements.txt
-export TG_TOKEN=...
-export OPENROUTER_API_KEY=...
+
 python app/main.py
 ```
 
