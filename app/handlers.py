@@ -95,7 +95,7 @@ async def show_features(c: CallbackQuery):
     context = json.dumps(specs, ensure_ascii=False, indent=2)
     prompt = {
         'ru': f"Ты — эксперт по дронам. Сократите до 2 предложений описание VTOL-дронов {name} на русском языке: {context}",
-        'en': f"You are a drone expert. Reduce the description of VTOL drones to 2 sentences {name} in English: {context}",
+        'en': f"You are a drone expert. Generate a very brief introduction to the drone (only the main characteristics) {name} in English: {context}",
         'cn': f"您是无人机专家。將垂直起降無人機的描述縮減為 2 句話 {name} 的特性: {context}"
     }[lang]
     result = await MistralAPI.query(prompt=prompt, system=prompt, max_tokens=500)
