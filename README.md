@@ -9,6 +9,7 @@ DroneGuru is a Telegram bot that provides VTOL drone information, Q\&A, and mode
 * 🔍 Search and answer using an embedded drone database.
 * 🎧 Voice responses generated in Russian, English, and Chinese.
 * 🔄 Caching for faster repeated queries.
+* 💾 Embedded drone database at \app\static_files\db.json
 
 ## Repo Structure
 
