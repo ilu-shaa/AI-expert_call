@@ -2,7 +2,7 @@ import json
 import os
 import base64
 class WorkWithCache:
-    path = os.getcwd().replace("\\", "/") + "/app/static_files/tts_cache.json"
+    path = os.getcwd().replace("\\", "/") + "/static_files/tts_cache.json"
     @staticmethod
     def append_cache(key: str, cache_bytes: bytes, text : str):
         with open(WorkWithCache.path, 'r') as file:

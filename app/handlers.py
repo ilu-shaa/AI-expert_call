@@ -13,15 +13,15 @@ from aiogram.types import (
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from app.config import OPENROUTER_API_KEY
-from app.keyboards.start_keyboard import lang_menu, start_kb, back_to_start
-from app.static_files.bot_answers import GREETINGS
-from app.new_voice_handler import chat_lang, WHISPER_LANG
-from app.workTools.WorkWithDB import WorkWithDB
-from app.workTools.WorkWithTTS import WorkWithTTS
-from app.workTools.WorkWithLLM import MistralAPI
-from app.workTools.WorkWithCache import WorkWithCache
-from app.workTools.search_db import search_db
+from config import OPENROUTER_API_KEY
+from keyboards.start_keyboard import lang_menu, start_kb, back_to_start
+from static_files.bot_answers import GREETINGS
+from new_voice_handler import chat_lang, WHISPER_LANG
+from workTools.WorkWithDB import WorkWithDB
+from workTools.WorkWithTTS import WorkWithTTS
+from workTools.WorkWithLLM import MistralAPI
+from workTools.WorkWithCache import WorkWithCache
+from workTools.search_db import search_db
 
 
 class Flag(StatesGroup):
