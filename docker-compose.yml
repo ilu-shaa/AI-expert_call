@@ -1,17 +1,7 @@
 services:
-  ollama:
-    image: ollama/ollama:0.9.3
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - OllamaModels:/root/.ollama/models
-
   droneguru:
     build: .
     container_name: droneguru_bot
-    depends_on:
-      - ollama
     environment:
       - TG_TOKEN=${TG_TOKEN}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
